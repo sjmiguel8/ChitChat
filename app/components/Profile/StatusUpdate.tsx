@@ -2,41 +2,60 @@
 
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
+import { useToast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 
 interface StatusUpdateProps {
   userId: string
+  onStatusCreated?: () => void
 }
 
-export default function StatusUpdate({ userId }: StatusUpdateProps) {
+export default function StatusUpdate({ userId, onStatusCreated }: StatusUpdateProps) {
   const [content, setContent] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!content.trim()) return
 
-    const { error } = await supabase.from("status_updates").insert({ user_id: userId, content })
+    setIsLoading(true)
+    try {
+      const { error } = await supabase.from("status_updates").insert({ user_id: userId, content: content.trim() })
 
-    if (error) {
-      console.error("Error creating status update:", error)
-    } else {
+      if (error) throw error
+
       setContent("")
-      // You might want to refresh the status list here
+      toast({
+        title: "Status Updated",
+        description: "Your status has been posted successfully!",
+      })
+      onStatusCreated?.()
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post status update. Please try again.",
+        variant: "destructive",
+      })
+      console.error("Error creating status update:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
-      <textarea
+    <form onSubmit={handleSubmit} className="mb-6 space-y-4">
+      <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="What's on your mind?"
-        className="w-full p-2 border rounded-md"
-        rows={3}
+        className="min-h-[100px]"
+        disabled={isLoading}
       />
-      <button type="submit" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-        Post Update
-      </button>
+      <Button type="submit" disabled={isLoading || !content.trim()}>
+        {isLoading ? "Posting..." : "Post Update"}
+      </Button>
     </form>
   )
 }
-
