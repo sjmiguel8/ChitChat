@@ -15,14 +15,15 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #5d1a1a 0%, #eb2525 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1.2;
 }
 
 .description {
-    color: #4b5563;
+    color: #000000;
     font-size: 1.125rem;
     max-width: 600px;
     margin: 0 auto 2rem;
@@ -39,7 +40,7 @@
     background: white;
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -61,17 +62,17 @@
 
 .username {
     font-weight: 600;
-    color: #1a365d;
+    color: #5d1a1a;
     margin-bottom: 0.25rem;
 }
 
 .timestamp {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: #806b6b;
 }
 
 .content {
-    color: #374151;
+    color: #513737;
     line-height: 1.5;
     margin-bottom: 1rem;
 }
@@ -79,7 +80,7 @@
 .stats {
     display: flex;
     gap: 1rem;
-    color: #6b7280;
+    color: #806b6b;
     font-size: 0.875rem;
 }
 
@@ -93,13 +94,13 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid #ebe5e5;
     padding-bottom: 0.5rem;
 }
 
 .tab {
     padding: 0.5rem 1rem;
-    color: #6b7280;
+    color: #806b6b;
     cursor: pointer;
     transition: all 0.2s;
     border-radius: 0.5rem 0.5rem 0 0;
@@ -107,12 +108,12 @@
 }
 
 .tab:hover {
-    color: #1a365d;
+    color: #5d1a1a;
 }
 
 .activeTab {
-    color: #2563eb;
-    border-bottom: 2px solid #2563eb;
+    color: #eb2525;
+    border-bottom: 2px solid #eb2525;
     margin-bottom: -0.5rem;
 }
 
