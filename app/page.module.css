@@ -152,7 +152,7 @@
 }
 
 .ctaButton:hover {
-    background: #1d4ed8;
+    background: #ce1717;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
 }
