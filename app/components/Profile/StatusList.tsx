@@ -54,7 +54,10 @@ const StatusList = forwardRef<StatusListHandle, StatusListProps>(({ userId }, re
     try {
       const { data, error } = await supabase
         .from("status_updates")
-        .select("*, profiles(username)")
+        .select(`
+          *,
+          profiles:profiles(username)
+        `)
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
+import Link from "next"
 import Layout from "@/app/components/Layout/Layout"
 import { supabase } from "@/lib/supabase"
 import ForumPosts from "@/app/components/Forum/ForumPosts"

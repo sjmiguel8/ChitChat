@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Layout from "../components/Layout/Layout"
 import { supabase } from "@/lib/supabase"
 import StatusUpdate from "../components/Profile/StatusUpdate"
-import StatusList from "../components/Profile/StatusList"
+import StatusList, { StatusListHandle } from "../components/Profile/StatusList"
 import { useToast } from "@/components/ui/use-toast"
 
 interface Profile {
@@ -18,27 +18,27 @@ export default function Profile() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const statusListRef = useRef<{ fetchStatuses: () => void } | null>(null)
+  const statusListRef = useRef<StatusListHandle>(null)
   const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
     const getUser = async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        
-        if (!user) {
+        // First set up auth listener to prevent race conditions
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.user) {
           router.push("/auth")
           return
         }
 
-        setUser(user)
+        const currentUser = session.user
+        setUser(currentUser)
+        
         let { data: profile, error } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", user.id)
+          .eq("id", currentUser.id)
           .single()
 
         if (error) {
@@ -46,7 +46,7 @@ export default function Profile() {
             // Profile doesn't exist, create a new one
             const { data: newProfile, error: insertError } = await supabase
               .from("profiles")
-              .insert({ id: user.id, username: user.email?.split("@")[0] })
+              .insert({ id: currentUser.id, username: currentUser.email?.split("@")[0] })
               .select()
               .single()
 
