@@ -35,7 +35,7 @@
 }
 
 .createButton {
-    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    background: linear-gradient(135deg, #221c1c 0%, #c50909 100%);
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -94,7 +94,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.875rem;
-    color: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    color: linear-gradient(135deg, #221c1c 0%, #c50909 100%);
 }
 
 .forumStats {

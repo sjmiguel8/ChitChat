@@ -37,7 +37,7 @@
     font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    background: linear-gradient(135deg, #221c1c 0%, #c50909 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -85,13 +85,13 @@
 
 .featureCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 12px rgb(0, 0, 0);
 }
 
 .featureCard h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    color: linear-gradient(135deg, #221c1c 0%, #c50909 100%);
     margin-bottom: 1rem;
     position: relative;
     padding-bottom: 0.5rem;
@@ -104,7 +104,7 @@
     left: 0;
     width: 50px;
     height: 2px;
-    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #5d1a1a 0%, #eb2525 100%);
 }
 
 .featureCard p {
@@ -148,7 +148,7 @@
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 2px 4px rgba(235, 37, 37, 0.2);
 }
 
 .ctaButton:hover {
