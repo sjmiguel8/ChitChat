@@ -15,14 +15,14 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1.2;
 }
 
 .description {
-    color: #4b5563;
+    color: #000000;
     font-size: 1.125rem;
     max-width: 600px;
     margin: 0 auto 2rem;
@@ -48,8 +48,8 @@
 
 .searchInput:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: #000000;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .searchIcon {
@@ -70,7 +70,7 @@
     background: white;
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -82,12 +82,12 @@
 .cardTitle {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1a365d;
+    color: #1c1f22;
     margin-bottom: 0.5rem;
 }
 
 .cardDescription {
-    color: #4b5563;
+    color: #000000;
     margin-bottom: 1rem;
     line-height: 1.5;
 }
@@ -96,7 +96,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #6b7280;
+    color: #806b6b;
     font-size: 0.875rem;
 }
 
@@ -108,8 +108,8 @@
 }
 
 .tag {
-    background: #f3f4f6;
-    color: #4b5563;
+    background: #f6f3f3;
+    color: #634b4b;
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
     font-size: 0.875rem;
@@ -124,28 +124,28 @@
 
 .filterButton {
     padding: 0.5rem 1rem;
-    border: 1px solid #e5e7eb;
+    border: 0px solid #000000;
     border-radius: 0.5rem;
     background: white;
-    color: #6b7280;
+    color: #806b6b;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .filterButton:hover {
-    border-color: #2563eb;
-    color: #2563eb;
+    border-color: #000000;
+    color: #eb2525;
 }
 
 .activeFilter {
-    background: #2563eb;
+    background: #eb2525;
     color: white;
-    border-color: #2563eb;
+    border-color: #eb2525;
 }
 
 .activeFilter:hover {
     color: white;
-    background: #1d4ed8;
+    background: #e67373;
 }
 
 @media (max-width: 768px) {
