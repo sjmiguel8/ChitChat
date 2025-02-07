@@ -13,7 +13,7 @@ interface Forum {
   description: string
   created_at: string
   created_by: string
-  profiles: {
+  creator: {
     username: string
   }
   _count?: {
@@ -37,7 +37,7 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
         .from("forums")
         .select(`
           *,
-          profiles!forums_created_by_fkey(username)
+          creator:profiles(username)
         `)
         .order("created_at", { ascending: false })
 
@@ -143,7 +143,7 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
               </CardTitle>
             </Link>
             <CardDescription>
-              Created by {forum.profiles.username} on{" "}
+              Created by {forum.creator.username} on{" "}
               {format(new Date(forum.created_at), "MMM d, yyyy")}
             </CardDescription>
           </CardHeader>

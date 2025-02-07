@@ -32,7 +32,7 @@ interface Post {
   created_at: string
   forum_id: number
   user_id: string
-  profiles: {
+  author: {
     username: string
   }
 }
@@ -83,7 +83,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
         .from("posts")
         .select(`
           *,
-          profiles (username)
+          author:profiles(username)
         `)
         .eq("forum_id", forumId)
         .order("created_at", { ascending: true })
@@ -227,7 +227,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">{post.profiles.username}</p>
+                    <p className="font-semibold">{post.author.username}</p>
                     <p className="text-sm text-gray-500">
                       {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
                     </p>
