@@ -13,7 +13,7 @@ export default function TrendingMessages() {
   const fetchTrendingMessages = async () => {
     const { data, error } = await supabase
       .from("status_updates")
-      .select("*, profiles(username)")
+      .select("*, profiles!status_updates_user_id_fkey(username)")
       .order("likes", { ascending: false })
       .limit(10)
 
@@ -36,4 +36,3 @@ export default function TrendingMessages() {
     </div>
   )
 }
-
