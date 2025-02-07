@@ -32,8 +32,8 @@ interface Post {
   created_at: string
   forum_id: number
   user_id: string
-  author: {
-    username: string
+  user?: {
+    username: string | null
   }
 }
 
@@ -80,11 +80,8 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
-        .from("posts")
-        .select(`
-          *,
-          author:profiles(username)
-        `)
+        .from('posts')
+        .select('*, user:profiles!posts_user_id_fkey(*)')
         .eq("forum_id", forumId)
         .order("created_at", { ascending: true })
 
@@ -227,7 +224,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">{post.author.username}</p>
+                    <p className="font-semibold">{post.user?.username || 'Unknown'}</p>
                     <p className="text-sm text-gray-500">
                       {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
                     </p>

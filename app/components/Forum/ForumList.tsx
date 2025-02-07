@@ -13,8 +13,8 @@ interface Forum {
   description: string
   created_at: string
   created_by: string
-  creator: {
-    username: string
+  user?: {
+    username: string | null
   }
   _count?: {
     posts: number
@@ -34,11 +34,8 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
     try {
       // First get forums with profiles
       const { data: forumData, error: forumError } = await supabase
-        .from("forums")
-        .select(`
-          *,
-          creator:profiles(username)
-        `)
+        .from('forums')
+        .select('*, user:profiles!forums_created_by_fkey(*)')
         .order("created_at", { ascending: false })
 
       if (forumError) throw forumError
@@ -143,7 +140,7 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
               </CardTitle>
             </Link>
             <CardDescription>
-              Created by {forum.creator.username} on{" "}
+              Created by {forum.user?.username || 'Unknown'} on{" "}
               {format(new Date(forum.created_at), "MMM d, yyyy")}
             </CardDescription>
           </CardHeader>
