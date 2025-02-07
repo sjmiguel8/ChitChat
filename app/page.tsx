@@ -1,10 +1,22 @@
+import { Container } from "postcss"
 import Layout from "./components/Layout/Layout"
+import styles from "@/app/page.module.css"
 
-export default function Home() {
+interface HomeProps {
+  children: React.ReactNode;
+}
+
+export default function Home({ children }: HomeProps) {
   return (
     <Layout>
-      <h1 className="text-3xl font-bold">Welcome to SocialNetwork</h1>
-      <p className="mt-4">Connect with friends, share updates, and explore new communities!</p>
+      <div className="container">
+      <h1 className= "Welcome to Debate!">Welcome to Debate!
+
+      </h1>
+      <p className= "">Where you can debate about anything and everything!</p>
+      <section className={styles.container}>{children}
+      </section>
+      </div>
     </Layout>
   )
 }
