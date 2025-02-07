@@ -52,6 +52,24 @@ export default function Layout({ children }: LayoutProps) {
                   Forums
                 </Link>
                 <Link
+                  href="/explore"
+                  className={`${styles.navLink} ${isActive("/explore")}`}
+                >
+                  Explore
+                </Link>
+                <Link
+                  href="/messages"
+                  className={`${styles.navLink} ${isActive("/messages")}`}
+                >
+                  Messages
+                </Link>
+                <Link
+                  href="/trending"
+                  className={`${styles.navLink} ${isActive("/trending")}`}
+                >
+                  Trending
+                </Link>
+                <Link
                   href="/profile"
                   className={`${styles.navLink} ${isActive("/profile")}`}
                 >
