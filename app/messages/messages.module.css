@@ -12,17 +12,19 @@
 }
 
 .title {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: 2.2rem;
+    font-weight: 600;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #5d1a1a 0%, #eb2525 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1.2;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .description {
-    color: #4b5563;
+    color: #000000;
     font-size: 1.125rem;
     max-width: 600px;
     margin: 0 auto 2rem;
@@ -40,7 +42,7 @@
     background: white;
     border-radius: 1rem;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
 }
 
 .conversationList {
@@ -57,12 +59,12 @@
 }
 
 .conversationItem:hover {
-    background: #f3f4f6;
+    background: #f6f3f3;
 }
 
 .activeConversation {
-    background: #f0f7ff;
-    border-left: 3px solid #2563eb;
+    background: #fff0f0;
+    border-left: 3px solid #000000;
 }
 
 .chatContainer {
@@ -71,7 +73,7 @@
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
 }
 
 .messageList {
@@ -91,15 +93,15 @@
 }
 
 .sentMessage {
-    background: #2563eb;
+    background: #eb2525;
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 0.25rem;
 }
 
 .receivedMessage {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: #f6f3f3;
+    color: #371f1f;
     align-self: flex-start;
     border-bottom-left-radius: 0.25rem;
 }
@@ -108,25 +110,25 @@
     display: flex;
     gap: 1rem;
     padding: 1rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #ebe5e5;
 }
 
 .input {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #ebe5e5;
     border-radius: 0.5rem;
     outline: none;
     transition: all 0.2s;
 }
 
 .input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: #eb2525;
+    box-shadow: 0 0 0 3px rgb(0, 0, 0);
 }
 
 .sendButton {
-    background: #2563eb;
+    background: #eb2525;
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -137,7 +139,7 @@
 }
 
 .sendButton:hover:not(:disabled) {
-    background: #1d4ed8;
+    background: #d81d1d;
     transform: translateY(-1px);
 }
 
