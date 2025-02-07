@@ -31,7 +31,7 @@
 }
 
 .createButton {
-    background: #2563eb;
+    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -41,13 +41,13 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 2px 4px rgb(0, 0, 0);
 }
 
 .createButton:hover {
-    background: #1d4ed8;
+    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
 }
 
 .grid {
@@ -62,24 +62,24 @@
     border-radius: 1rem;
     padding: 1.5rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgb(0, 0, 0);
 }
 
 .forumCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 12px rgb(0, 0, 0);
 }
 
 .forumTitle {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1a365d;
+    color: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
     margin-bottom: 0.5rem;
     line-height: 1.4;
 }
 
 .forumDescription {
-    color: #4b5563;
+    color: #000000;
     font-size: 0.875rem;
     margin-bottom: 1rem;
     line-height: 1.5;
@@ -90,7 +90,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
 }
 
 .forumStats {
