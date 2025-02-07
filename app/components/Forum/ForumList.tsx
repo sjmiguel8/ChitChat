@@ -77,6 +77,43 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
 
   useEffect(() => {
     fetchForums()
+
+    // Set up real-time subscription for forums
+    const forumChannel = supabase
+      .channel('forum_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'forums'
+        },
+        () => {
+          fetchForums()
+        }
+      )
+      .subscribe()
+
+    // Set up real-time subscription for posts (to update post counts)
+    const postsChannel = supabase
+      .channel('posts_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'posts'
+        },
+        () => {
+          fetchForums()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(forumChannel)
+      supabase.removeChannel(postsChannel)
+    }
   }, [])
 
   useImperativeHandle(ref, () => ({

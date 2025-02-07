@@ -54,6 +54,27 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
 
   useEffect(() => {
     fetchPosts()
+
+    // Set up real-time subscription for posts in this forum
+    const channel = supabase
+      .channel('forum_posts_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'posts',
+          filter: `forum_id=eq.${forumId}`
+        },
+        () => {
+          fetchPosts()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [forumId])
 
   const fetchPosts = async () => {

@@ -77,6 +77,27 @@ const StatusList = forwardRef<StatusListHandle, StatusListProps>(({ userId }, re
 
   useEffect(() => {
     fetchStatuses()
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('status_updates_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'status_updates',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          fetchStatuses()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [userId])
 
   useImperativeHandle(ref, () => ({
