@@ -12,6 +12,6 @@ provider "vercel" {
 }
 
 resource "vercel_project" "nextjs_project" {
-  name = "Chittchat" 
+  name = "chittchat" 
   framework = "nextjs"
 }
