@@ -4,7 +4,7 @@
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #ffffff;
     min-height: 100vh;
 }
 
@@ -58,6 +58,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin: 4rem 0;
+    background-color: white;
 }
 
 @media (max-width: 768px) {
@@ -149,6 +150,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(235, 37, 37, 0.2);
+    margin-top: 30px;
 }
 
 .ctaButton:hover {

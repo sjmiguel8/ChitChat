@@ -14,12 +14,11 @@
 
 .title {
     font-size: 2.5rem;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    margin-top: auto;
     clip: text;
     -webkit-clip: text;
-    -webkit-text-fill-color: transparent;
     line-height: 0.8;
     border-radius: 3.0px;
 }

@@ -23,10 +23,8 @@ export default function ForumPage() {
     <Layout>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Discussion Forums</h1>
-          <p className={styles.description}>
-            Join our vibrant community discussions on various topics. Create a new forum or
-            participate in existing ones.
+          <p className={styles.title}>
+            Current Forums
           </p>
           {user && (
             <button
