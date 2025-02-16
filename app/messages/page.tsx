@@ -141,9 +141,6 @@ export default function MessagesPage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Messages</h1>
-          <p className={styles.description}>
-            Chat with other members of the community
-          </p>
         </header>
 
         <div className={styles.grid}>

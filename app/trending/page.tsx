@@ -77,9 +77,6 @@ export default function TrendingPage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Trending Now</h1>
-          <p className={styles.description}>
-            Discover the most popular discussions and updates
-          </p>
         </header>
 
         <div className={styles.tabs}>

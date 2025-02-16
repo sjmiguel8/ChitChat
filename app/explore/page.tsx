@@ -120,9 +120,6 @@ export default function ExplorePage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Explore</h1>
-          <p className={styles.description}>
-            Discover new discussions, trending topics, and connect with others
-          </p>
         </header>
 
         <div className={styles.searchBar}>

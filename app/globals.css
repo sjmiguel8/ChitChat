@@ -64,7 +64,7 @@
   }
 
   * {
-    border: 1px solid hsl(var(--border));
+    border: 0px solid hsl(var(--border));
   }
 
   body {
