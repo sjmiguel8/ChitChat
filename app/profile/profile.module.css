@@ -12,22 +12,22 @@
 }
 
 .title {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #5d1a1a 0%, #eb2525 100%);
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .description {
-    color: #634b4b;
-    font-size: 1.125rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 1.25rem;
     max-width: 600px;
-    margin: 0 auto 2rem;
-    line-height: 1.5;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
 }
 
 .grid {
@@ -37,11 +37,18 @@
 }
 
 .sidebar {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
+    background: hsl(var(--card));
+    border-radius: 1.25rem;
+    padding: 2rem;
     height: fit-content;
-    box-shadow: 0 4px 6px rgb(0, 0, 0);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(var(--border));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border-color: hsl(var(--primary) / 0.2);
 }
 
 .profileInfo {
@@ -59,20 +66,20 @@
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    color: #806b6b;
+    color: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
     font-weight: 600;
 }
 
 .username {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #5d1a1a;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 0.75rem;
 }
 
 .email {
-    color: #806b6b;
-    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 1rem;
 }
 
 .stats {
@@ -83,40 +90,65 @@
 }
 
 .statCard {
-    background: #fcf8f8;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    background: hsl(var(--accent));
+    padding: 1.25rem;
+    border-radius: 1rem;
     text-align: center;
+    transition: all 0.3s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    background: hsl(var(--accent) / 0.8);
 }
 
 .statNumber {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #eb2525;
-    margin-bottom: 0.25rem;
+    color: hsl(var(--primary));
+    margin-bottom: 0.5rem;
 }
 
 .statLabel {
-    font-size: 0.75rem;
-    color: #806b6b;
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    font-weight: 500;
 }
 
 .content {
-    background: white;
-    border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgb(0, 0, 0);
+    background: hsl(var(--card));
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(var(--border));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border-color: hsl(var(--primary) / 0.2);
 }
 
 .sectionTitle {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #5d1a1a;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #c6bfbf;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid hsl(var(--border));
+    position: relative;
+}
+
+.sectionTitle::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.3) 100%);
 }
 
 @media (max-width: 768px) {

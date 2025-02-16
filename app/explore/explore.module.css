@@ -15,7 +15,7 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #1c1f22 0%, #c50909 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -135,18 +135,18 @@
 
 .filterButton:hover {
     border-color: #000000;
-    color: #eb2525;
+    color: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
 }
 
 .activeFilter {
-    background: #eb2525;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
     color: white;
-    border-color: #eb2525;
+    border-color: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
 }
 
 .activeFilter:hover {
     color: white;
-    background: #e67373;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
 }
 
 @media (max-width: 768px) {
