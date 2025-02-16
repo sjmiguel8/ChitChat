@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next"
+import Link from "next/link"
 import Layout from "@/app/components/Layout/Layout"
 import { supabase } from "@/lib/supabase"
 import ForumPosts from "@/app/components/Forum/ForumPosts"
@@ -52,44 +52,45 @@ export default function ForumPage({ params }: { params: { id: string } }) {
     getUser()
   }, [router])
 
-  useEffect(() => {
-    const fetchForum = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("forums")
-          .select(`
-            *,
-            profiles (username)
-          `)
-          .eq("id", params.id)
-          .single()
+  const fetchForum = async () => {
+    try {
+      const { id } = await params
+      const { data, error } = await supabase
+        .from("forums")
+        .select(`
+          *,
+          profiles (username)
+        `)
+        .eq("id", id)
+        .single()
 
-        if (error) throw error
-        if (!data) {
-          toast({
-            title: "Error",
-            description: "Forum not found.",
-            variant: "destructive",
-          })
-          router.push("/forum")
-          return
-        }
-
-        setForum(data)
-      } catch (error) {
+      if (error) throw error
+      if (!data) {
         toast({
           title: "Error",
-          description: "Failed to fetch forum details.",
+          description: "Forum not found.",
           variant: "destructive",
         })
-        console.error("Error fetching forum:", error)
-      } finally {
-        setIsLoading(false)
+        router.push("/forum")
+        return
       }
-    }
 
+      setForum(data)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch forum details.",
+        variant: "destructive",
+      })
+      console.error("Error fetching forum:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchForum()
-  }, [params.id, router, toast])
+  }, [])
 
   if (isLoading) {
     return (
