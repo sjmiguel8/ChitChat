@@ -2,12 +2,9 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import Layout from "@/app/components/Layout/Layout"
 import { supabase } from "@/lib/supabase"
 import ForumPosts from "@/app/components/Forum/ForumPosts"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 import {
   Breadcrumb,
@@ -19,6 +16,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { format } from "date-fns"
 import { useToast } from "@/components/ui/use-toast"
+import styles from "./forum-detail.module.css"
 
 interface Forum {
   id: number
@@ -106,7 +104,7 @@ export default function ForumPage({ params }: { params: { id: string } }) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center text-red-500">Forum not found</div>
+          <div className="text-center text-destructive">Forum not found</div>
         </div>
       </Layout>
     )
@@ -114,42 +112,43 @@ export default function ForumPage({ params }: { params: { id: string } }) {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <div className="flex flex-col space-y-4">
-          <Button
-            variant="ghost"
-            className="w-fit"
-            onClick={() => router.push("/forum")}
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Back to Forums
-          </Button>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <nav className={styles.navigation}>
+            <button
+              className={styles.backButton}
+              onClick={() => router.push("/forum")}
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Back to Forums
+            </button>
 
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/forum">Forums</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{forum.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/forum">Forums</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{forum.name}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </nav>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{forum.name}</CardTitle>
-            <CardDescription>
+          <div className={styles.forumCard}>
+            <h1 className={styles.forumTitle}>{forum.name}</h1>
+            <div className={styles.forumMeta}>
               Created by {forum.profiles.username} on{" "}
               {format(new Date(forum.created_at), "MMM d, yyyy")}
-            </CardDescription>
-            <p className="mt-2 text-gray-600">{forum.description}</p>
-          </CardHeader>
-        </Card>
+            </div>
+            <p className={styles.forumDescription}>{forum.description}</p>
+          </div>
+        </div>
 
-        {user && <ForumPosts forumId={forum.id} userId={user.id} />}
+        <div className={styles.content}>
+          {user && <ForumPosts forumId={forum.id} userId={user.id} />}
+        </div>
       </div>
     </Layout>
   )

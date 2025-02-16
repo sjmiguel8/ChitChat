@@ -1,0 +1,145 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.createPostCard {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    padding: 2rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.createPostTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 1.5rem;
+}
+
+.createPostForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.textarea:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.1);
+    outline: none;
+}
+
+.postsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1.25rem;
+}
+
+.postCard {
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.postCard:hover {
+    border-color: hsl(var(--primary) / 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.postHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+}
+
+.postMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.username {
+    font-weight: 600;
+    color: hsl(var(--primary));
+}
+
+.timestamp {
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.editButton {
+    color: hsl(var(--primary));
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--primary) / 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.editButton:hover {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.deleteButton {
+    color: hsl(var(--destructive));
+    background: hsl(var(--destructive) / 0.1);
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.deleteButton:hover {
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+}
+
+.postContent {
+    color: hsl(var(--foreground));
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    margin-top: 1rem;
+}
+
+.emptyState {
+    text-align: center;
+    color: hsl(var(--muted-foreground));
+    padding: 2rem;
+    font-size: 1.125rem;
+}

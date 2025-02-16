@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { format } from "date-fns"
 import {
   AlertDialog,
@@ -23,8 +22,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import styles from "./forum-posts.module.css"
 
 interface Post {
   id: number
@@ -55,7 +54,6 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   useEffect(() => {
     fetchPosts()
 
-    // Set up real-time subscription for posts in this forum
     const channel = supabase
       .channel('forum_posts_changes')
       .on(
@@ -192,78 +190,69 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   }
 
   if (isLoading) {
-    return <div className="text-center my-8">Loading posts...</div>
+    return <div className={styles.emptyState}>Loading posts...</div>
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create a New Post</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreatePost} className="space-y-4">
-            <Textarea
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-              placeholder="Write your post here..."
-              className="min-h-[100px]"
-              disabled={isSubmitting}
-            />
-            <Button type="submit" disabled={isSubmitting || !newPost.trim()}>
-              {isSubmitting ? "Posting..." : "Post"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className={styles.container}>
+      <div className={styles.createPostCard}>
+        <h2 className={styles.createPostTitle}>Create a New Post</h2>
+        <form onSubmit={handleCreatePost} className={styles.createPostForm}>
+          <textarea
+            value={newPost}
+            onChange={(e) => setNewPost(e.target.value)}
+            placeholder="Write your post here..."
+            className={styles.textarea}
+            disabled={isSubmitting}
+          />
+          <Button
+            type="submit"
+            disabled={isSubmitting || !newPost.trim()}
+            className="w-full md:w-auto"
+          >
+            {isSubmitting ? "Posting..." : "Post"}
+          </Button>
+        </form>
+      </div>
 
-      <ScrollArea className="h-[600px] rounded-md border p-4">
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <Card key={post.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-semibold">{post.user?.username || 'Unknown'}</p>
-                    <p className="text-sm text-gray-500">
-                      {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
-                    </p>
-                  </div>
-                  {post.user_id === userId && (
-                    <div className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setEditingPost(post)
-                          setEditContent(post.content)
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDeletePost(post)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  )}
+      <ScrollArea className={styles.postsList}>
+        {posts.map((post) => (
+          <div key={post.id} className={styles.postCard}>
+            <div className={styles.postHeader}>
+              <div className={styles.postMeta}>
+                <span className={styles.username}>{post.user?.username || 'Unknown'}</span>
+                <span className={styles.timestamp}>
+                  {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
+                </span>
+              </div>
+              {post.user_id === userId && (
+                <div className={styles.actions}>
+                  <button
+                    className={styles.editButton}
+                    onClick={() => {
+                      setEditingPost(post)
+                      setEditContent(post.content)
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => setDeletePost(post)}
+                  >
+                    Delete
+                  </button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{post.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-          {posts.length === 0 && (
-            <p className="text-center text-gray-500">
-              No posts yet. Be the first to post in this forum!
-            </p>
-          )}
-        </div>
+              )}
+            </div>
+            <p className={styles.postContent}>{post.content}</p>
+          </div>
+        ))}
+        {posts.length === 0 && (
+          <p className={styles.emptyState}>
+            No posts yet. Be the first to post in this forum!
+          </p>
+        )}
       </ScrollArea>
 
       <Dialog open={!!editingPost} onOpenChange={() => setEditingPost(null)}>
@@ -271,10 +260,10 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
-          <Textarea
+          <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[100px]"
+            className={styles.textarea}
             disabled={isSubmitting}
           />
           <DialogFooter>

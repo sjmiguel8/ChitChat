@@ -13,11 +13,11 @@
 }
 
 .title {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     margin-top: auto;
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 46%) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -36,11 +36,11 @@
 .createButton {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    padding: 1rem 2rem;
+    padding: 1rem 2.5rem;
     border-radius: 1rem;
     font-weight: 600;
-    font-size: 1.125rem;
-    border: none;
+    font-size: 1.25rem;
+    border: 1px solid hsl(var(--border));
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 3rem;
@@ -65,14 +65,30 @@
     border-radius: 1.25rem;
     padding: 2rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border: 1px solid hsl(var(--border));
+    position: relative;
+    overflow: hidden;
 }
 
 .forumCard:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     border-color: hsl(var(--primary) / 0.2);
+}
+
+.forumCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent,
+        hsl(var(--primary) / 0.2),
+        transparent
+    );
 }
 
 .forumTitle {
