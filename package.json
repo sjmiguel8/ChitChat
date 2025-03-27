@@ -37,13 +37,8 @@
     "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
-<<<<<<< HEAD
-    "@tailwindcss/postcss": "latest",
-    "@supabase/supabase-js": "latest",
-=======
     "@supabase/supabase-js": "latest",
     "@tailwindcss/postcss": "latest",
->>>>>>> 48b5d6c (Initial commit)
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
@@ -51,11 +46,7 @@
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-<<<<<<< HEAD
-    "next": "latest",
-=======
     "next": "^15.2.4",
->>>>>>> 48b5d6c (Initial commit)
     "next-themes": "^0.4.4",
     "react": "^18",
     "react-day-picker": "8.10.1",
