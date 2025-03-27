@@ -42,3 +42,40 @@ next-env.d.ts
 
 # Supabase
 /supabase/.temp
+.supabase
+.branches
+.temp
+.env.local
+.env.*.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+.idea
+*.swp
+*.swo
+
+# Local development specific
+*.log
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache directories
+.cache
+.npm
+.eslintcache
+
+.terraform
+.terraform/*

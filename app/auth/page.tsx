@@ -20,6 +20,13 @@ export default function Auth() {
     setIsLoading(true)
 
     try {
+<<<<<<< HEAD
+=======
+      if (!supabase) {
+        throw new Error("Supabase client not initialized")
+      }
+
+>>>>>>> 48b5d6c (Initial commit)
       if (mode === "sign-up") {
         const { error } = await supabase.auth.signUp({
           email,
@@ -35,6 +42,7 @@ export default function Auth() {
           description: "We've sent you a link to verify your email address.",
         })
       } else {
+<<<<<<< HEAD
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -47,6 +55,27 @@ export default function Auth() {
       toast({
         title: "Error",
         description: error.message,
+=======
+        try {
+          const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+          if (error) throw error
+
+          router.push("/")
+        } catch (signInError: any) {
+          if (signInError.message === "Failed to fetch") {
+            throw new Error("Unable to connect to authentication service. Please check your internet connection and try again.")
+          }
+          throw signInError
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Authentication Error",
+        description: error.message || "An unexpected error occurred",
+>>>>>>> 48b5d6c (Initial commit)
         variant: "destructive",
       })
     } finally {
