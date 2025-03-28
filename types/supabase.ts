@@ -183,3 +183,7 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+  export type StatusUpdate = Database['public']['Tables']['status_updates']['Row']
+  export type StatusUpdateInsert = Database['public']['Tables']['status_updates']['Insert']
+  export type StatusUpdateUpdate = Database['public']['Tables']['status_updates']['Update']

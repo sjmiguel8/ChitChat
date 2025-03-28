@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation"
 import Layout from "../components/Layout/Layout"
 import ForumList from "../components/Forum/ForumList"
 import CreateForumForm from "../components/Forum/CreateForumForm"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription 
+} from "@/components/ui/dialog"
 import styles from "../../app/forum/forum.module.css"
 import { useUser } from "../lib/hooks"
 
@@ -42,6 +48,9 @@ export default function ForumPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Forum</DialogTitle>
+              <DialogDescription>
+                Create a new discussion forum. Enter a name and description for your forum.
+              </DialogDescription>
             </DialogHeader>
             <CreateForumForm
               userId={user?.id || ""}
