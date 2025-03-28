@@ -13,7 +13,7 @@ interface Forum {
   name: string
   description: string
   created_at: string
-  created_by: string
+  created_by: string | null
   user?: {
     username: string | null
   }
