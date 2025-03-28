@@ -13,21 +13,23 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 -- Create profiles policies
-create policy "Public profiles are viewable by everyone"
-  on profiles for select
-  using ( true );
+DO $$ BEGIN
+CREATE POLICY IF NOT EXISTS "Public profiles are viewable by everyone"
+  ON profiles FOR SELECT
+  USING ( true );
 
-create policy "Users can insert their own profile"
-  on profiles for insert
-  with check ( auth.uid() = id );
+CREATE POLICY IF NOT EXISTS "Users can insert their own profile"
+  ON profiles FOR INSERT
+  WITH CHECK ( auth.uid() = id );
 
-create policy "Users can update their own profile"
-  on profiles for update
-  using ( auth.uid() = id );
+CREATE POLICY IF NOT EXISTS "Users can update their own profile"
+  ON profiles FOR UPDATE
+  USING ( auth.uid() = id );
 
-create policy "Users can delete their own profile"
-  on profiles for delete
-  using ( auth.uid() = id );
+CREATE POLICY IF NOT EXISTS "Users can delete their own profile"
+  ON profiles FOR DELETE
+  USING ( auth.uid() = id );
+END $$;
 
 -- Function to handle new user creation
 create or replace function public.handle_new_user()
