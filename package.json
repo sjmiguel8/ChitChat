@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "tsx scripts/migrate.ts",
-    "migrate:create": "node -e \"require('fs').writeFileSync('supabase/migrations/' + Date.now() + '_' + process.argv[1] + '.sql', '')\""
+    "migrate:create": "tsx scripts/create-migration.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
