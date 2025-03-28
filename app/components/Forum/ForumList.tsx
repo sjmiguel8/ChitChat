@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 interface Forum {
   id: number
@@ -32,43 +33,41 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
 
   const fetchForums = async () => {
     try {
-      // First get forums with profiles
       const { data: forumData, error: forumError } = await supabase
         .from('forums')
-        .select('*, user:profiles!forums_created_by_fkey(*)')
-        .order("created_at", { ascending: false })
+        .select(`
+          *,
+          user:profiles(username)
+        `)
+        .order('created_at', { ascending: false });
 
-      if (forumError) throw forumError
+      if (forumError) throw forumError;
 
-      // Then get post counts for each forum
+      // Get post counts
       const forumsWithCounts = await Promise.all(
         forumData.map(async (forum) => {
-          const { count, error: countError } = await supabase
-            .from("posts")
-            .select("*", { count: "exact", head: true })
-            .eq("forum_id", forum.id)
-
-          if (countError) throw countError
+          const { count } = await supabase
+            .from('posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('forum_id', forum.id);
 
           return {
             ...forum,
-            _count: {
-              posts: count || 0
-            }
-          }
+            _count: { posts: count || 0 }
+          };
         })
-      )
+      );
 
-      setForums(forumsWithCounts)
+      setForums(forumsWithCounts);
     } catch (error) {
+      console.error('Error fetching forums:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch forums. Please try again.",
-        variant: "destructive",
-      })
-      console.error("Error fetching forums:", error)
+        title: 'Error',
+        description: 'Failed to fetch forums. Please try again.',
+        variant: 'destructive'
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -152,6 +151,17 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
           </CardContent>
         </Card>
       ))}
+      <Dialog>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Forum</DialogTitle>
+            <DialogDescription>
+              Create a new discussion forum. Enter the details below.
+            </DialogDescription>
+          </DialogHeader>
+          {/* Rest of your dialog content */}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 })
