@@ -20,59 +20,39 @@ export default function Auth() {
     setIsLoading(true)
 
     try {
-      // Add validation for Supabase URL
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        throw new Error('Supabase URL not configured')
-      }
-
-      // Add network check
-      try {
-        await fetch(process.env.NEXT_PUBLIC_SUPABASE_URL, { method: 'HEAD' })
-      } catch (networkError) {
-        throw new Error('Cannot connect to Supabase - please check your internet connection')
-      }
-
       if (!supabase) {
-        throw new Error("Supabase client not initialized")
+        throw new Error('Supabase client not initialized')
       }
 
-      if (mode === "sign-up") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        })
-        if (error) throw error
-        
-        toast({
-          title: "Check your email",
-          description: "We've sent you a link to verify your email address.",
-        })
-      } else {
-        try {
-          const { error } = await supabase.auth.signInWithPassword({
-            email,
+      const response = mode === 'sign-in' 
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({ 
+            email, 
             password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/auth/callback`
+            }
           })
-          if (error) throw error
 
-          router.push("/")
-        } catch (signInError: any) {
-          if (signInError.message === "Failed to fetch") {
-            throw new Error("Unable to connect to authentication service. Please check your internet connection and try again.")
-          }
-          throw signInError
-        }
+      if (response.error) {
+        throw response.error
+      }
+
+      if (mode === 'sign-in') {
+        router.push('/')
+      } else {
+        toast({
+          title: 'Check your email',
+          description: 'We sent you a confirmation link.'
+        })
       }
     } catch (error: any) {
-      toast({
-        title: "Authentication Error",
-        description: error.message || "An unexpected error occurred",
-        variant: "destructive",
-      })
       console.error('Auth error:', error)
+      toast({
+        title: 'Error',
+        description: error.message || 'Authentication failed',
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
