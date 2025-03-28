@@ -20,6 +20,18 @@ export default function Auth() {
     setIsLoading(true)
 
     try {
+      // Add validation for Supabase URL
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        throw new Error('Supabase URL not configured')
+      }
+
+      // Add network check
+      try {
+        await fetch(process.env.NEXT_PUBLIC_SUPABASE_URL, { method: 'HEAD' })
+      } catch (networkError) {
+        throw new Error('Cannot connect to Supabase - please check your internet connection')
+      }
+
       if (!supabase) {
         throw new Error("Supabase client not initialized")
       }
@@ -60,6 +72,7 @@ export default function Auth() {
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       })
+      console.error('Auth error:', error)
     } finally {
       setIsLoading(false)
     }
