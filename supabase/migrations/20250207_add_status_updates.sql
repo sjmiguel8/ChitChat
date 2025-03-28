@@ -20,11 +20,6 @@ create table public.status_updates (
 alter table public.profiles enable row level security;
 alter table public.status_updates enable row level security;
 
--- Profiles policies
-create policy "Public profiles are viewable by everyone"
-    on public.profiles for select
-    using (true);
-
 create policy "Users can insert their own profile"
     on public.profiles for insert
     with check (auth.uid() = id);
@@ -33,10 +28,6 @@ create policy "Users can update own profile"
     on public.profiles for update
     using (auth.uid() = id);
 
--- Status updates policies
-create policy "Status updates are viewable by everyone"
-    on public.status_updates for select
-    using (true);
 
 create policy "Users can create their own status updates"
     on public.status_updates for insert

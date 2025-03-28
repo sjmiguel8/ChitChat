@@ -25,24 +25,45 @@ export default function StatusList({ userId }: StatusListProps) {
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
+  const fetchStatuses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('status_updates')
+        .select(`
+          *,
+          profiles:user_id (username)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setStatuses(data || [])
+    } catch (error) {
+      console.error('Error fetching statuses:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch status updates',
+        variant: 'destructive'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchStatuses()
-
-    // Set up real-time subscription
+    
+    // Real-time subscription
     const channel = supabase
-      .channel('status_updates_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'status_updates',
-          filter: `user_id=eq.${userId}`
-        },
-        () => {
-          fetchStatuses()
-        }
-      )
+      .channel('status_updates')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'status_updates',
+        filter: `user_id=eq.${userId}`
+      }, () => {
+        fetchStatuses()
+      })
       .subscribe()
 
     return () => {
@@ -50,54 +71,28 @@ export default function StatusList({ userId }: StatusListProps) {
     }
   }, [userId])
 
-  const fetchStatuses = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("status_updates")
-        .select('*, user:profiles!status_updates_user_id_fkey(*)')
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
-      setStatuses(data)
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch status updates.",
-        variant: "destructive",
-      })
-      console.error("Error fetching statuses:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleDelete = async (statusId: number) => {
     try {
       const { error } = await supabase
-        .from("status_updates")
+        .from('status_updates')
         .delete()
-        .eq("id", statusId)
+        .eq('id', statusId)
+        .eq('user_id', userId)
 
       if (error) throw error
 
       toast({
-        title: "Status Deleted",
-        description: "Your status has been deleted successfully.",
+        title: 'Success',
+        description: 'Status update deleted'
       })
       fetchStatuses()
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to delete status. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to delete status update',
+        variant: 'destructive'
       })
-      console.error("Error deleting status:", error)
     }
-  }
-
-  if (isLoading) {
-    return <div>Loading status updates...</div>
   }
 
   return (
@@ -105,26 +100,24 @@ export default function StatusList({ userId }: StatusListProps) {
       {statuses.map((status) => (
         <div key={status.id} className={styles.statusCard}>
           <div className={styles.statusHeader}>
-            <div className={styles.statusInfo}>
-              <span className={styles.username}>
-                {status.user?.username || status.user_id}
-              </span>
-              <span className={styles.timestamp}>
+            <div>
+              <p className={styles.content}>{status.content}</p>
+              <small className={styles.timestamp}>
                 {format(new Date(status.created_at), "MMM d, yyyy 'at' h:mm a")}
-              </span>
+              </small>
             </div>
-            <button
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={() => handleDelete(status.id)}
-              className={`${styles.actionButton} ${styles.deleteButton}`}
             >
               Delete
-            </button>
+            </Button>
           </div>
-          <p className={styles.statusContent}>{status.content}</p>
         </div>
       ))}
       {!isLoading && statuses.length === 0 && (
-        <p>No status updates yet.</p>
+        <p className={styles.emptyState}>No status updates yet</p>
       )}
     </div>
   )

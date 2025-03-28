@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 
 interface CreateForumFormProps {
   userId: string
@@ -19,6 +20,7 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
   const [description, setDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,28 +28,31 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
 
     setIsLoading(true)
     try {
-      const { error } = await supabase.from("forums").insert({
-        name: name.trim(),
-        description: description.trim(),
-        created_by: userId,
-      })
+      const { data, error } = await supabase
+        .from("forums")
+        .insert({
+          name: name.trim(),
+          description: description.trim(),
+          created_by: userId,
+        })
+        .select()
+        .single()
 
       if (error) throw error
 
       toast({
-        title: "Forum Created",
-        description: "Your forum has been created successfully!",
+        title: "Success",
+        description: "Forum created successfully!",
       })
-      setName("")
-      setDescription("")
+      
       onForumCreated?.()
+      router.push('/forum') // Redirect to forums page
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create forum. Please try again.",
+        description: "Failed to create forum",
         variant: "destructive",
       })
-      console.error("Error creating forum:", error)
     } finally {
       setIsLoading(false)
     }
