@@ -1,12 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as dotenv from 'dotenv'
+
+// Load environment variables
+dotenv.config({ path: '.env.local' })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('Missing Supabase environment variables')
+  console.error('Missing environment variables:')
+  if (!supabaseUrl) console.error('- NEXT_PUBLIC_SUPABASE_URL')
+  if (!supabaseServiceKey) console.error('- SUPABASE_SERVICE_ROLE_KEY')
+  throw new Error('Required environment variables are missing')
 }
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)

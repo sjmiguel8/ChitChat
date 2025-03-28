@@ -29,14 +29,18 @@ export default function StatusUpdate({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from('status_updates')
         .select(`
-          *,
-          user:profiles!status_updates_user_id_fkey(username)
+          id,
+          content,
+          created_at,
+          user_id,
+          likes,
+          user:profiles(username)
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setStatuses(data || [])
+      setStatuses((data as unknown as Status[]) || [])
     } catch (error) {
       console.error('Error fetching statuses:', error)
       toast({
@@ -77,6 +81,23 @@ export default function StatusUpdate({ userId }: { userId: string }) {
 
     setIsSubmitting(true)
     try {
+      // First ensure user has a profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .single()
+
+      if (profileError || !profile) {
+        // Create profile if it doesn't exist
+        const { error: createProfileError } = await supabase
+          .from('profiles')
+          .insert({ id: userId })
+
+        if (createProfileError) throw createProfileError
+      }
+
+      // Now create the status update
       const { error } = await supabase
         .from('status_updates')
         .insert({
@@ -93,12 +114,11 @@ export default function StatusUpdate({ userId }: { userId: string }) {
       setNewStatus("")
       fetchStatuses()
     } catch (error) {
+      console.error('Error posting status:', error)
       toast({
         title: "Error",
-        description: "Failed to post status update",
-        variant: "destructive"
+        description: "Failed to post status update. Please try again."
       })
-      console.error('Error posting status:', error)
     } finally {
       setIsSubmitting(false)
     }
