@@ -5,24 +5,6 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { format, formatDistanceToNow } from "date-fns"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import styles from "./forum-posts.module.css"
 import { PostgrestError } from '@supabase/supabase-js'
@@ -66,6 +48,9 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const [replyContent, setReplyContent] = useState("")
   const [replyingTo, setReplyingTo] = useState<number | null>(null)
   const { toast } = useToast()
+  const [editingPostId, setEditingPostId] = useState<number | null>(null)
+  const [editingContent, setEditingContent] = useState("")
+  const [deletingPostId, setDeletingPostId] = useState<number | null>(null)
 
   const fetchForumPosts = async () => {
     try {
@@ -157,15 +142,15 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
     }
   };
 
-  const handleEdit = async () => {
-    if (!editingPost || !editContent.trim() || isSubmitting) return
+  const handleEdit = async (postId: number) => {
+    if (!editingContent.trim() || isSubmitting) return
 
     setIsSubmitting(true)
     try {
       const { error } = await supabase
         .from("posts")
-        .update({ content: editContent.trim() })
-        .eq("id", editingPost.id)
+        .update({ content: editingContent.trim() })
+        .eq("id", postId)
 
       if (error) throw error
 
@@ -174,7 +159,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
         description: "Your post has been updated successfully!",
       })
       fetchForumPosts()
-      setEditingPost(null)
+      setEditingPostId(null)
     } catch (error) {
       toast({
         title: "Error",
@@ -187,15 +172,15 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deletePost || isSubmitting) return
+  const handleDelete = async (postId: number) => {
+    if (isSubmitting) return
 
     setIsSubmitting(true)
     try {
       const { error } = await supabase
         .from("posts")
         .delete()
-        .eq("id", deletePost.id)
+        .eq("id", postId)
 
       if (error) throw error
 
@@ -212,7 +197,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       })
       console.error("Error deleting post:", error)
     } finally {
-      setDeletePost(null)
+      setDeletingPostId(null)
       setIsSubmitting(false)
     }
   }
@@ -301,25 +286,84 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
                 </div>
                 {post.user_id === userId && (
                   <div className={styles.actions}>
-                    <button
-                      className={styles.editButton}
-                      onClick={() => {
-                        setEditingPost(post)
-                        setEditContent(post.content)
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => setDeletePost(post)}
-                    >
-                      Delete
-                    </button>
+                    {editingPostId === post.id ? (
+                      <div className={styles.editActions}>
+                        <Button 
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleEdit(post.id)}
+                          disabled={isSubmitting}
+                        >
+                          Save
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingPostId(null)
+                            setEditingContent("")
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingPostId(post.id)
+                            setEditingContent(post.content)
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        {deletingPostId === post.id ? (
+                          <div className={styles.deleteConfirm}>
+                            <span className={styles.deleteWarning}>Delete?</span>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDelete(post.id)}
+                              disabled={isSubmitting}
+                            >
+                              Yes
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDeletingPostId(null)}
+                            >
+                              No
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeletingPostId(post.id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
-              <p className={styles.postContent}>{post.content}</p>
+
+              {editingPostId === post.id ? (
+                <textarea
+                  value={editingContent}
+                  onChange={(e) => setEditingContent(e.target.value)}
+                  className={styles.textarea}
+                  disabled={isSubmitting}
+                  autoFocus
+                />
+              ) : (
+                <p className={styles.postContent}>{post.content}</p>
+              )}
 
               <div className={styles.replies}>
                 <Button 
@@ -405,48 +449,6 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
           )}
         </div>
       </ScrollArea>
-
-      <Dialog open={!!editingPost} onOpenChange={() => setEditingPost(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Post</DialogTitle>
-            <DialogDescription>
-              Make changes to your post below.
-            </DialogDescription>
-          </DialogHeader>
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className={styles.textarea}
-            disabled={isSubmitting}
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingPost(null)}>
-              Cancel
-            </Button>
-            <Button onClick={handleEdit} disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={!!deletePost} onOpenChange={() => setDeletePost(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Post</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your post.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isSubmitting}>
-              {isSubmitting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   )
 }
