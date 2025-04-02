@@ -146,7 +146,7 @@
   margin-top: 2rem;
 }
 
-.trendingCard {
+.statusCard, .forumCard {
   background: hsl(var(--card));
   border-radius: 1.25rem;
   padding: 2rem;
@@ -155,7 +155,7 @@
   position: relative;
 }
 
-.trendingCard:hover {
+.statusCard:hover, .forumCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
   border-color: hsl(var(--primary) / 0.2);
@@ -167,18 +167,27 @@
   padding-bottom: 1rem;
 }
 
+.forumInfo {
+  margin-bottom: 1rem;
+}
+
+.forumName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  margin-bottom: 0.5rem;
+}
+
 .userInfo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .username {
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 0.925rem;
   color: hsl(var(--foreground));
-  letter-spacing: -0.025em;
 }
 
 .metadata {
@@ -186,22 +195,21 @@
   align-items: center;
   gap: 0.5rem;
   color: hsl(var(--muted-foreground));
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .content {
   color: hsl(var(--foreground));
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
 
 .stats {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   color: hsl(var(--muted-foreground));
-  font-size: 0.9rem;
-  align-items: center;
+  font-size: 0.875rem;
 }
 
 .stat {
@@ -210,11 +218,18 @@
   gap: 0.5rem;
 }
 
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+.emptyState {
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+  padding: 2rem;
+  font-size: 1.125rem;
+}
 
+.forumTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin: 1rem 0;
     .container {
         padding: 1rem;
     }

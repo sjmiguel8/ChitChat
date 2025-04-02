@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import Layout from "../components/Layout/Layout"
 import { format } from "date-fns"
-import { MessageCircle, ThumbsUp, Heart, User, Clock } from "lucide-react"
+import { MessageCircle, ThumbsUp, Heart, User, Clock, MessageSquare } from "lucide-react"
 import { 
   Card, 
   CardContent, 
@@ -128,7 +128,7 @@ export default function TrendingPage() {
                 <div className={styles.emptyState}>No trending status updates yet</div>
               ) : (
                 trendingStatuses.map((status) => (
-                  <div key={status.id} className={styles.trendingCard}>
+                  <div key={status.id} className={styles.statusCard}>
                     <div className={styles.cardHeader}>
                       <div className={styles.userInfo}>
                         <User className="h-4 w-4" />
@@ -136,7 +136,7 @@ export default function TrendingPage() {
                       </div>
                       <div className={styles.metadata}>
                         <Clock className="h-4 w-4" />
-                        <span>{format(new Date(status.created_at), "MMMM d, yyyy 'at' h:mm a")}</span>
+                        <span>{format(new Date(status.created_at), "MMM d, yyyy")}</span>
                       </div>
                     </div>
                     <p className={styles.content}>{status.content}</p>
@@ -152,40 +152,36 @@ export default function TrendingPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="posts" className="mt-6">
-            <div className="grid gap-6">
+          <TabsContent value="posts">
+            <div className={styles.trendingGrid}>
               {isLoading ? (
-                <div className="text-center py-8">Loading trending posts...</div>
+                <div className={styles.emptyState}>Loading trending posts...</div>
               ) : trendingPosts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No trending forum posts yet
-                </div>
+                <div className={styles.emptyState}>No trending posts yet</div>
               ) : (
                 trendingPosts.map((post) => (
-                  <Card 
-                    key={post.id} 
-                    className="hover:shadow-lg transition-all duration-300 cursor-pointer"
-                    onClick={() => router.push(`/forum/${post.forum_id}`)}
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center justify-between">
-                        <span>{post.profiles.username}</span>
-                        <span className="text-sm text-muted-foreground">
-                          in {post.forums.name}
-                        </span>
-                      </CardTitle>
-                      <CardDescription>
-                        {format(new Date(post.created_at), "MMMM d, yyyy 'at' h:mm a")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-foreground/80 mb-4">{post.content}</p>
-                      <div className="flex items-center gap-2 text-muted-foreground">
+                  <div key={post.id} className={styles.forumCard}>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.forumInfo}>
+                        <h3 className={styles.forumName}>{post.forums.name}</h3>
+                        <div className={styles.userInfo}>
+                          <User className="h-4 w-4" />
+                          <span className={styles.username}>{post.profiles.username}</span>
+                        </div>
+                      </div>
+                      <div className={styles.metadata}>
+                        <Clock className="h-4 w-4" />
+                        <span>{format(new Date(post.created_at), "MMM d, yyyy")}</span>
+                      </div>
+                    </div>
+                    <p className={styles.content}>{post.content}</p>
+                    <div className={styles.stats}>
+                      <div className={styles.stat}>
                         <MessageCircle className="h-4 w-4" />
                         <span>{post._count.replies} replies</span>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))
               )}
             </div>
@@ -193,5 +189,5 @@ export default function TrendingPage() {
         </Tabs>
       </div>
     </Layout>
-  )
+  );
 }
