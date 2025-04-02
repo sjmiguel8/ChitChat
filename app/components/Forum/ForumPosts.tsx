@@ -260,24 +260,24 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   return (
     <div className={styles.container}>
       <div className={styles.createPostCard}>
-        <h2 className={styles.createPostTitle}>Create a New Post</h2>
-        <form onSubmit={handleCreatePost} className={styles.createPostForm}>
+        <h2 className={styles.createReplyTitle}>Create a New Reply</h2>
+        <form onSubmit={handleCreatePost} className={styles.createReplyForm}>
           <textarea
             value={newPost}
             onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Write your post here..."
+            placeholder="Write your reply..."
             className={styles.textarea}
             disabled={isSubmitting}
             autoComplete="off"
-            name="post-content"
-            id="post-content"
+            name="reply-content"
+            id="reply-content"
           />
           <Button
             type="submit"
             disabled={isSubmitting || !newPost.trim()}
             className="w-full md:w-auto"
           >
-            {isSubmitting ? "Posting..." : "Post"}
+            {isSubmitting ? "Replying..." : "Reply"}
           </Button>
         </form>
       </div>

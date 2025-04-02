@@ -30,17 +30,24 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
       // First ensure user has a profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select()
+        .select('id, username')
         .eq('id', userId)
         .single()
 
-      if (profileError || !profile) {
+      if (profileError) {
+        console.error('Profile fetch error:', profileError)
         // Create profile if it doesn't exist
         const { error: createProfileError } = await supabase
           .from('profiles')
-          .insert({ id: userId })
+          .insert({ 
+            id: userId,
+            username: `user_${userId.slice(0, 8)}` // Fallback username
+          })
 
-        if (createProfileError) throw createProfileError
+        if (createProfileError) {
+          console.error('Profile creation error:', createProfileError)
+          throw new Error(`Failed to create profile: ${createProfileError.message}`)
+        }
       }
 
       const { data, error } = await supabase
@@ -48,12 +55,20 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
         .insert({
           name: name.trim(),
           description: description.trim(),
-          created_by: userId
+          created_by: userId,
+          created_at: new Date().toISOString()
         })
-        .select()
+        .select('*')
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Forum creation error:', error)
+        throw new Error(`Failed to create forum: ${error.message}`)
+      }
+
+      if (!data) {
+        throw new Error('No data returned from forum creation')
+      }
 
       toast({
         title: "Success",
@@ -70,7 +85,7 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
       console.error("Error creating forum:", error)
       toast({
         title: "Error",
-        description: "Failed to create forum. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create forum. Please try again.",
         variant: "destructive",
       })
     } finally {

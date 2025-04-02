@@ -30,6 +30,23 @@
   gap: 1.5rem;
 }
 
+.createReplyTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 46%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.createReplyForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .textarea {
   width: 100%;
   min-height: 120px;
