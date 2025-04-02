@@ -33,9 +33,9 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
           name: name.trim(),
           description: description.trim(),
           created_by: userId,
+          user_id: userId,
         })
         .select()
-        .single()
 
       if (error) throw error
 
@@ -44,12 +44,10 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
         description: "Forum created successfully!",
       })
       
-      onForumCreated?.()
-      
-      // Clear form and close dialog
+      // Clear form and trigger callback
       setName("")
       setDescription("")
-      setIsLoading(false)
+      onForumCreated?.()
     } catch (error) {
       console.error("Error creating forum:", error)
       toast({
@@ -57,6 +55,7 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
         description: "Failed to create forum. Please try again.",
         variant: "destructive",
       })
+    } finally {
       setIsLoading(false)
     }
   }

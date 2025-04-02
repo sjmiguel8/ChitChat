@@ -20,6 +20,16 @@ export default function ForumPage() {
     router.refresh()
   }
 
+  if (!user) {
+    return (
+      <Layout>
+        <div className={styles.container}>
+          <p className="text-center">Please log in to view forums.</p>
+        </div>
+      </Layout>
+    )
+  }
+
   return (
     <Layout>
       <div className={styles.container}>
