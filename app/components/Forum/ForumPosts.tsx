@@ -75,27 +75,38 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
     }
   }, [forumId])
 
-  const fetchPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*, user:profiles!posts_user_id_fkey(*)')
-        .eq("forum_id", forumId)
-        .order("created_at", { ascending: true })
+const fetchPosts = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*, user:profiles(username)')
+      .eq("forum_id", forumId)
+      .order("created_at", { ascending: true })
 
-      if (error) throw error
+    if (error) {
+      if (error instanceof SelectQueryError) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch posts due to a schema error. Please check your Supabase configuration.",
+          variant: "destructive",
+        })
+      } else {
+        throw error
+      }
+    } else {
       setPosts(data)
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch posts. Please try again.",
-        variant: "destructive",
-      })
-      console.error("Error fetching posts:", error)
-    } finally {
-      setIsLoading(false)
     }
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to fetch posts. Please try again.",
+      variant: "destructive",
+    })
+    console.error("Error fetching posts:", error)
+  } finally {
+    setIsLoading(false)
   }
+}
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -296,3 +307,65 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
     </div>
   )
 }
+
+export default function ForumPage() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const router = useRouter();
+  const { user } = useUser();
+
+  const handleForumCreated = () => {
+    setIsCreateOpen(false);
+    router.refresh();
+  };
+
+  const handlePostCreated = () => {
+    router.push(`/forum/${forumId}`);
+  };
+
+  return (
+    <Layout>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <p className={styles.title}>Current Forums</p>
+          {user && (
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className={styles.createButton}
+            >
+              Create New Forum
+            </button>
+          )}
+        </header>
+
+        <ForumList />
+
+        {isCreateOpen && (
+          <CreateForumForm
+            userId={user?.id || ""}
+            onForumCreated={handleForumCreated}
+          />
+        )}
+
+        <ForumPosts
+          forumId={forumId}
+          userId={user?.id || ""}
+          onPostCreated={handlePostCreated}
+        />
+      </div>
+    </Layout>
+  );
+}
+
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  forum_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
+  FOREIGN KEY (forum_id) REFERENCES forums (id),
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE INDEX idx_posts_forum_id ON posts (forum_id);
+CREATE INDEX idx_posts_user_id ON posts (user_id);

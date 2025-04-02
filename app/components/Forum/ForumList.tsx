@@ -37,7 +37,7 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
         .from('forums')
         .select(`
           *,
-          user:profiles(username)
+          user:profiles!created_by(username)
         `)
         .order('created_at', { ascending: false });
 
