@@ -120,37 +120,33 @@ export default function TrendingPage() {
             <TabsTrigger value="posts">Forum Posts</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="status" className="mt-6">
-            <div className="grid gap-6">
+          <TabsContent value="status">
+            <div className={styles.trendingGrid}>
               {isLoading ? (
-                <div className="text-center py-8">Loading trending status updates...</div>
+                <div className={styles.emptyState}>Loading trending status updates...</div>
               ) : trendingStatuses.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No trending status updates yet
-                </div>
+                <div className={styles.emptyState}>No trending status updates yet</div>
               ) : (
                 trendingStatuses.map((status) => (
-                  <Card key={status.id} className="hover:shadow-lg transition-all duration-300">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-medium flex items-center gap-2">
+                  <div key={status.id} className={styles.trendingCard}>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.userInfo}>
                         <User className="h-4 w-4" />
-                        <span className="text-foreground/90">{status.profiles.username}</span>
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        {format(new Date(status.created_at), "MMMM d, yyyy 'at' h:mm a")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-foreground/80 mb-4 text-base leading-relaxed">
-                        {status.content}
-                      </p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className={styles.username}>{status.profiles.username}</span>
+                      </div>
+                      <div className={styles.metadata}>
+                        <Clock className="h-4 w-4" />
+                        <span>{format(new Date(status.created_at), "MMMM d, yyyy 'at' h:mm a")}</span>
+                      </div>
+                    </div>
+                    <p className={styles.content}>{status.content}</p>
+                    <div className={styles.stats}>
+                      <div className={styles.stat}>
                         <Heart className="h-4 w-4" />
                         <span>{status.likes} likes</span>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))
               )}
             </div>

@@ -140,6 +140,76 @@
     margin-top: 1rem;
 }
 
+.trendingGrid {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.trendingCard {
+  background: hsl(var(--card));
+  border-radius: 1.25rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid hsl(var(--border));
+  position: relative;
+}
+
+.trendingCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: hsl(var(--primary) / 0.2);
+}
+
+.cardHeader {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 1rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: hsl(var(--foreground));
+  letter-spacing: -0.025em;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+}
+
+.content {
+  color: hsl(var(--foreground));
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 @media (max-width: 768px) {
     .grid {
         grid-template-columns: 1fr;
