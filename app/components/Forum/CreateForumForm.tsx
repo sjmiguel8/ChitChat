@@ -78,6 +78,12 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      handleSubmit(e as any);
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -88,7 +94,9 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Enter forum name"
+          className="text-foreground placeholder:text-muted-foreground bg-background"
           disabled={isLoading}
           required
           maxLength={100}
@@ -102,8 +110,9 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
           name="forum-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Enter forum description"
-          className="min-h-[100px]"
+          className="min-h-[100px] text-foreground placeholder:text-muted-foreground bg-background"
           disabled={isLoading}
           required
           maxLength={500}
