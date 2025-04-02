@@ -45,14 +45,18 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
       })
       
       onForumCreated?.()
-      router.push('/forum') // Redirect to forums page
+      
+      // Clear form and close dialog
+      setName("")
+      setDescription("")
+      setIsLoading(false)
     } catch (error) {
+      console.error("Error creating forum:", error)
       toast({
         title: "Error",
-        description: "Failed to create forum",
+        description: "Failed to create forum. Please try again.",
         variant: "destructive",
       })
-    } finally {
       setIsLoading(false)
     }
   }
@@ -60,22 +64,25 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Forum Name</Label>
+        <Label htmlFor="forum-name">Forum Name</Label>
         <Input
+          id="forum-name"
+          name="forum-name"
           type="text"
-          id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter forum name"
           disabled={isLoading}
           required
           maxLength={100}
+          autoComplete="off"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="forum-description">Description</Label>
         <Textarea
-          id="description"
+          id="forum-description" 
+          name="forum-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter forum description"
@@ -83,6 +90,7 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
           disabled={isLoading}
           required
           maxLength={500}
+          autoComplete="off"
         />
       </div>
       <div className="flex justify-end">

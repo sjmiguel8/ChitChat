@@ -5,20 +5,15 @@ import { useRouter } from "next/navigation"
 import Layout from "../components/Layout/Layout"
 import ForumList from "../components/Forum/ForumList"
 import CreateForumForm from "../components/Forum/CreateForumForm"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogDescription 
-} from "@/components/ui/dialog"
-import styles from "../../app/forum/forum.module.css"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import styles from "./forum.module.css"
 import { useUser } from "../lib/hooks"
 
 export default function ForumPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const router = useRouter()
   const { user } = useUser()
+  const dialogDescription = "Create a new discussion forum. Enter a name and description for your forum."
 
   const handleForumCreated = () => {
     setIsCreateOpen(false)
@@ -29,9 +24,7 @@ export default function ForumPage() {
     <Layout>
       <div className={styles.container}>
         <header className={styles.header}>
-          <p className={styles.title}>
-            Current Forums
-          </p>
+          <p className={styles.title}>Current Forums</p>
           {user && (
             <button
               onClick={() => setIsCreateOpen(true)}

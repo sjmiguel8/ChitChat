@@ -18,6 +18,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -65,47 +66,37 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchForumPosts()
-    fetchStatusUpdates()
+    fetchForumPosts();
+    fetchStatusUpdates(); // Make sure status updates are fetched initially
 
-    // Subscribe to forum posts changes
-    const forumChannel = supabase
-      .channel('forum_posts_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'posts',
-          filter: `forum_id=eq.${forumId}`
-        },
-        () => {
-          fetchForumPosts()
-        }
-      )
-      .subscribe()
+    const postsChannel = supabase
+      .channel(`posts_${forumId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'posts',
+        filter: `forum_id=eq.${forumId}`
+      }, () => {
+        fetchForumPosts();
+      })
+      .subscribe();
 
-    // Subscribe to status updates changes
     const statusChannel = supabase
-      .channel('status_updates_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'status_updates'
-        },
-        () => {
-          fetchStatusUpdates()
-        }
-      )
-      .subscribe()
+      .channel('status_updates')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'status_updates'
+      }, () => {
+        fetchStatusUpdates();
+      })
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(forumChannel)
-      supabase.removeChannel(statusChannel)
-    }
-  }, [forumId])
+      supabase.removeChannel(postsChannel);
+      supabase.removeChannel(statusChannel);
+    };
+  }, [forumId]);
 
   const fetchForumPosts = async () => {
     try {
@@ -113,19 +104,19 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
         .from('posts')
         .select('*, user:profiles(username)')
         .eq('forum_id', forumId)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) throw error
-      setForumPosts(data || [])
+      if (error) throw error;
+      setForumPosts(data || []);
     } catch (error) {
-      console.error('Error fetching forum posts:', error)
+      console.error('Error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to fetch forum posts',
+        description: 'Failed to fetch posts',
         variant: 'destructive'
-      })
+      });
     }
-  }
+  };
 
   const fetchStatusUpdates = async () => {
     try {
@@ -135,51 +126,59 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
           *,
           user:profiles(username)
         `)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      if (error) throw error
-      setStatusUpdates(data || [])
+      if (error) throw error;
+      if (data) setStatusUpdates(data);
+      return data;
     } catch (error) {
-      console.error('Error fetching status updates:', error)
+      console.error('Error fetching status updates:', error);
       toast({
         title: 'Error',
         description: 'Failed to fetch status updates',
         variant: 'destructive'
-      })
+      });
+      return [];
     }
-  }
+  };
 
   const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newPost.trim() || isSubmitting) return
+    e.preventDefault();
+    if (!newPost.trim() || isSubmitting) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("posts").insert({
-        content: newPost.trim(),
-        forum_id: forumId,
-        user_id: userId,
-      })
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({
+          content: newPost.trim(),
+          forum_id: forumId,
+          user_id: userId
+        })
+        .select('*, user:profiles(username)')
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
-      toast({
-        title: "Post Created",
-        description: "Your post has been published successfully!",
-      })
-      setNewPost("")
-      fetchForumPosts()
+      if (data) {
+        setForumPosts(current => [data, ...current]);
+        setNewPost('');
+        toast({
+          title: 'Success',
+          description: 'Post created successfully!'
+        });
+      }
     } catch (error) {
+      console.error('Error:', error);
       toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive",
-      })
-      console.error("Error creating post:", error)
+        title: 'Error',
+        description: 'Failed to create post',
+        variant: 'destructive'
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleEdit = async () => {
     if (!editingPost || !editContent.trim() || isSubmitting) return
@@ -256,6 +255,9 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
             placeholder="Write your post here..."
             className={styles.textarea}
             disabled={isSubmitting}
+            autoComplete="off"
+            name="post-content"
+            id="post-content"
           />
           <Button
             type="submit"
@@ -335,6 +337,9 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
+            <DialogDescription>
+              Make changes to your post below.
+            </DialogDescription>
           </DialogHeader>
           <textarea
             value={editContent}
@@ -356,7 +361,7 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       <AlertDialog open={!!deletePost} onOpenChange={() => setDeletePost(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Post</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete your post.
             </AlertDialogDescription>
