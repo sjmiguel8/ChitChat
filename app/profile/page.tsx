@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
+  const [statusUpdates, setStatusUpdates] = useState<any[]>([])
   const [username, setUsername] = useState("")
   const [avatarUrl, setAvatarUrl] = useState("")
   const [uploading, setUploading] = useState(false)

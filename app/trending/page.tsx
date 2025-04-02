@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import Layout from "../components/Layout/Layout"
 import { format } from "date-fns"
-import { MessageCircle, ThumbsUp, Heart } from "lucide-react"
+import { MessageCircle, ThumbsUp, Heart, User, Clock } from "lucide-react"
 import { 
   Card, 
   CardContent, 
@@ -132,16 +132,20 @@ export default function TrendingPage() {
                 trendingStatuses.map((status) => (
                   <Card key={status.id} className="hover:shadow-lg transition-all duration-300">
                     <CardHeader>
-                      <CardTitle className="text-lg">
-                        {status.profiles.username}
+                      <CardTitle className="text-lg font-medium flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        <span className="text-foreground/90">{status.profiles.username}</span>
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="flex items-center gap-2">
+                        <Clock className="h-3 w-3" />
                         {format(new Date(status.created_at), "MMMM d, yyyy 'at' h:mm a")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-foreground/80 mb-4">{status.content}</p>
-                      <div className="flex items-center gap-2 text-muted-foreground">
+                      <p className="text-foreground/80 mb-4 text-base leading-relaxed">
+                        {status.content}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Heart className="h-4 w-4" />
                         <span>{status.likes} likes</span>
                       </div>

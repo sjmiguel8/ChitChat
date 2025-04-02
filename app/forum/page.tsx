@@ -7,6 +7,9 @@ import ForumList from "../components/Forum/ForumList"
 import { Button } from "@/components/ui/button" // Add Button import
 import styles from "./forum.module.css"
 import { useUser } from "../lib/hooks"
+import "app/forum/forum.module.css"
+import "app/forum/forum-posts.module.css"
+
 
 export default function ForumPage() {
   const router = useRouter()

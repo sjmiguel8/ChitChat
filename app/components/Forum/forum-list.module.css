@@ -1,0 +1,81 @@
+.forumGrid {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.forumCard {
+  background: hsl(var(--card));
+  border-radius: 1.25rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid hsl(var(--border));
+  position: relative;
+}
+
+.forumCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: hsl(var(--primary) / 0.2);
+}
+
+.titleLink {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  transition: color 0.2s ease;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.title:hover {
+  color: hsl(var(--primary));
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+}
+
+.username {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.description {
+  color: hsl(var(--foreground));
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

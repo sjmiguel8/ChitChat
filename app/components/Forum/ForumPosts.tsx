@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,13 +73,13 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
         .from('posts')
         .select(`
           *,
-          profiles:profiles!posts_user_id_fkey(username),
+          profiles!posts_user_id_fkey(id, username),
           replies(
             id,
             content,
             created_at,
             user_id,
-            profiles:profiles!replies_user_id_fkey(username)
+            profiles!replies_user_id_fkey(id, username)
           )
         `)
         .eq('forum_id', forumId)
@@ -284,15 +284,20 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
 
       <ScrollArea className={styles.postsList}>
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Forum Posts</h3>
           {forumPosts.map((post) => (
             <div key={post.id} className={styles.postCard}>
               <div className={styles.postHeader}>
                 <div className={styles.postMeta}>
-                  <span className={styles.username}>{post.user?.username || 'Unknown'}</span>
-                  <span className={styles.timestamp}>
-                    {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
-                  </span>
+                  <div className={styles.userInfo}>
+                    <span className={styles.username}>
+                      {post.profiles?.username || 'Unknown'}
+                    </span>
+                    <span className={styles.bullet}>•</span>
+                    <span className={styles.timestamp}>
+                      {formatDistanceToNow(new Date(post.created_at))} ago
+                    </span>
+                  </div>
+                  <p className={styles.postContent}>{post.content}</p>
                 </div>
                 {post.user_id === userId && (
                   <div className={styles.actions}>

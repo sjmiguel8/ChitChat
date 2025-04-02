@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format, formatDistanceToNow } from "date-fns"
 import { MessageSquare, Clock, User } from "lucide-react"
+import styles from "./forum-list.module.css"
 
 interface Forum {
   id: number
@@ -37,7 +38,7 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
         .from('forums')
         .select(`
           *,
-          user:profiles!created_by(username)
+          profiles!created_by(username)
         `)
         .order('created_at', { ascending: false });
 
@@ -129,43 +130,35 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
   }
 
   return (
-    <div className="grid gap-6 mt-8">
+    <div className={styles.forumGrid}>
       {forums.map((forum) => (
-        <Card 
-          key={forum.id} 
-          className="transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg border border-border/40 bg-card"
-        >
-          <CardHeader className="space-y-2">
-            <Link href={`/forum/${forum.id}`}>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-[hsl(142,76%,46%)] bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                {forum.name}
-              </CardTitle>
-            </Link>
-            <CardDescription className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div key={forum.id} className={styles.forumCard}>
+          <Link href={`/forum/${forum.id}`} className={styles.titleLink}>
+            <h2 className={styles.title}>{forum.name}</h2>
+          </Link>
+          
+          <div className={styles.metadata}>
+            <div className={styles.metaItem}>
               <User className="h-4 w-4" />
-              <span>Created by {forum.user?.username || 'Unknown'}</span>
-              <span className="text-xs opacity-60">•</span>
-              <time className="text-xs">
-                {format(new Date(forum.created_at), "MMMM d, yyyy")}
-              </time>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-foreground/80 mb-4 text-base leading-relaxed">
-              {forum.description}
-            </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <MessageSquare className="h-4 w-4" />
-                <span>{forum._count?.posts || 0} posts</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                <span>{formatDistanceToNow(new Date(forum.created_at))} ago</span>
-              </div>
+              <span className={styles.username}>
+                {forum.user?.username || 'Unknown'}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className={styles.metaItem}>
+              <Clock className="h-4 w-4" />
+              <span>Created {formatDistanceToNow(new Date(forum.created_at))} ago</span>
+            </div>
+          </div>
+          
+          <p className={styles.description}>{forum.description}</p>
+          
+          <div className={styles.stats}>
+            <div className={styles.stat}>
+              <MessageSquare className="h-4 w-4" />
+              <span>{forum._count?.posts || 0} posts</span>
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   )
