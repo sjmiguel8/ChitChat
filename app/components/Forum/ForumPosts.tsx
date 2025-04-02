@@ -36,6 +36,7 @@ interface ForumPost {
   user?: {
     username: string | null
   }
+  replies?: Reply[]
 }
 
 interface StatusUpdate {
@@ -44,6 +45,17 @@ interface StatusUpdate {
   created_at: string
   user_id: string
   likes: number
+  user?: {
+    username: string | null
+  }
+}
+
+interface Reply {
+  id: number
+  content: string
+  created_at: string
+  post_id: number
+  user_id: string
   user?: {
     username: string | null
   }
@@ -63,6 +75,8 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const [editContent, setEditContent] = useState("")
   const [deletePost, setDeletePost] = useState<ForumPost | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [replyContent, setReplyContent] = useState("")
+  const [replyingTo, setReplyingTo] = useState<number | null>(null)
   const { toast } = useToast()
 
   const fetchForumPosts = async () => {
@@ -70,13 +84,31 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       const { data, error } = await supabase
         .from('posts')
         .select(`
-          *,
-          profiles!posts_user_id_fkey(username)
+          id,
+          content,
+          created_at,
+          forum_id,
+          user_id,
+          profiles:profiles!posts_user_id_fkey (
+            id,
+            username
+          ),
+          replies (
+            id,
+            content,
+            created_at,
+            user_id,
+            profiles:profiles!replies_user_id_fkey (
+              id,
+              username
+            )
+          )
         `)
         .eq('forum_id', forumId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
       setForumPosts(data || []);
       setIsLoading(false);
     } catch (error) {
@@ -244,6 +276,42 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
     }
   }
 
+  const handleReply = async (postId: number) => {
+    if (!replyContent.trim() || isSubmitting) return
+
+    setIsSubmitting(true)
+    try {
+      const { data, error } = await supabase
+        .from('replies')
+        .insert({
+          content: replyContent.trim(),
+          post_id: postId,
+          user_id: userId
+        })
+        .select('*, user:profiles(username)')
+        .single()
+
+      if (error) throw error
+
+      toast({
+        title: "Reply Added",
+        description: "Your reply has been posted successfully!"
+      })
+      
+      setReplyContent("")
+      setReplyingTo(null)
+      fetchForumPosts()
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post reply",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   if (isLoading) {
     return <div className={styles.emptyState}>Loading posts...</div>
   }
@@ -306,6 +374,84 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
                 )}
               </div>
               <p className={styles.postContent}>{post.content}</p>
+
+              <div className={styles.replies}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setReplyingTo(post.id)}
+                >
+                  Reply
+                </Button>
+
+                {replyingTo === post.id && (
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      handleReply(post.id)
+                    }}
+                    className={styles.replyForm}
+                  >
+                    <textarea
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder="Write your reply..."
+                      className={styles.textarea}
+                      disabled={isSubmitting}
+                    />
+                    <div className="flex justify-end gap-2 mt-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setReplyingTo(null)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting || !replyContent.trim()}
+                      >
+                        {isSubmitting ? "Posting..." : "Post Reply"}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {post.replies && post.replies.length > 0 && (
+                  <div className={styles.replyList}>
+                    {post.replies.map((reply) => (
+                      <div key={reply.id} className={styles.replyCard}>
+                        <div className={styles.postHeader}>
+                          <div className={styles.postMeta}>
+                            <span className={styles.username}>
+                              {reply.user?.username || 'Unknown'}
+                            </span>
+                            <span className={styles.timestamp}>
+                              {format(new Date(reply.created_at), "MMM d, yyyy 'at' h:mm a")}
+                            </span>
+                          </div>
+                          {reply.user_id === userId && (
+                            <div className={styles.actions}>
+                              <button
+                                className={styles.editButton}
+                                onClick={() => handleEditReply(reply)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className={styles.deleteButton}
+                                onClick={() => handleDeleteReply(reply)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <p className={styles.postContent}>{reply.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
           {forumPosts.length === 0 && (

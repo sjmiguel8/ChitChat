@@ -1,71 +1,97 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useUser } from "../lib/hooks"
 import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import Layout from "../components/Layout/Layout"
 import { format } from "date-fns"
+import { MessageCircle, ThumbsUp, Heart } from "lucide-react"
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription 
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import styles from "./trending.module.css"
 
-interface Post {
+interface ForumPost {
+  id: number
+  content: string
+  created_at: string
+  user_id: string
+  forum_id: number
+  forums: {
+    id: number
+    name: string
+  }
+  profiles: {
+    username: string
+  }
+  _count: {
+    replies: number
+  }
+}
+
+interface StatusUpdate {
   id: number
   content: string
   created_at: string
   likes: number
-  user: {
-    username: string | null
-  }
-  _count?: {
-    comments: number
+  user_id: string
+  profiles: {
+    username: string
   }
 }
 
-type TrendingTab = "status" | "forums"
-
 export default function TrendingPage() {
-  const [tab, setTab] = useState<TrendingTab>("status")
-  const [items, setItems] = useState<Post[]>([])
+  const [trendingPosts, setTrendingPosts] = useState<ForumPost[]>([])
+  const [trendingStatuses, setTrendingStatuses] = useState<StatusUpdate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
-    fetchTrendingItems()
-  }, [tab])
+    fetchTrendingContent()
+  }, [])
 
-  const fetchTrendingItems = async () => {
-    setIsLoading(true)
+  const fetchTrendingContent = async () => {
     try {
-      if (tab === "status") {
-        const { data, error } = await supabase
-          .from("status_updates")
+      setIsLoading(true)
+      const [postsResult, statusResult] = await Promise.all([
+        supabase
+          .from('posts')
           .select(`
             *,
-            user:profiles!status_updates_user_id_fkey(username)
+            forums!inner(id, name),
+            profiles!posts_user_id_fkey(username),
+            _count(replies)
           `)
-          .order("likes", { ascending: false })
-          .limit(10)
-
-        if (error) throw error
-        setItems(data)
-      } else {
-        const { data, error } = await supabase
-          .from("posts")
+          .order('created_at', { ascending: false })
+          .limit(10),
+        supabase
+          .from('status_updates')
           .select(`
             *,
-            user:profiles!posts_user_id_fkey(username)
+            profiles!status_updates_user_id_fkey(username)
           `)
-          .order("likes", { ascending: false })
+          .order('likes', { ascending: false })
           .limit(10)
+      ])
 
-        if (error) throw error
-        setItems(data)
-      }
-    } catch (error: any) {
+      if (postsResult.error) throw postsResult.error
+      if (statusResult.error) throw statusResult.error
+
+      setTrendingPosts(postsResult.data || [])
+      setTrendingStatuses(statusResult.data || [])
+    } catch (error) {
+      console.error('Error fetching trending content:', error)
       toast({
-        title: "Error",
-        description: "Failed to fetch trending items",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to fetch trending content'
       })
     } finally {
       setIsLoading(false)
@@ -77,60 +103,88 @@ export default function TrendingPage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Trending Now</h1>
+          <p className={styles.description}>
+            Check out what's popular across ChitChat
+          </p>
         </header>
 
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${tab === "status" ? styles.activeTab : ""}`}
-            onClick={() => setTab("status")}
-          >
-            Status Updates
-          </button>
-          <button
-            className={`${styles.tab} ${tab === "forums" ? styles.activeTab : ""}`}
-            onClick={() => setTab("forums")}
-          >
-            Forum Posts
-          </button>
-        </div>
+        <Tabs defaultValue="status" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="status">Status Updates</TabsTrigger>
+            <TabsTrigger value="posts">Forum Posts</TabsTrigger>
+          </TabsList>
 
-        {isLoading ? (
-          <div className="text-center">Loading trending items...</div>
-        ) : (
-          <div className={styles.grid}>
-            {items.map((item) => (
-              <div key={item.id} className={styles.card}>
-                <div className={styles.header}>
-                  <div className={styles.info}>
-                    <div className={styles.username}>
-                      {item.user.username || "Anonymous"}
-                    </div>
-                    <div className={styles.timestamp}>
-                      {format(new Date(item.created_at), "MMM d, yyyy")}
-                    </div>
-                  </div>
+          <TabsContent value="status" className="mt-6">
+            <div className="grid gap-6">
+              {isLoading ? (
+                <div className="text-center py-8">Loading trending status updates...</div>
+              ) : trendingStatuses.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No trending status updates yet
                 </div>
-                <div className={styles.content}>{item.content}</div>
-                <div className={styles.stats}>
-                  <div className={styles.stat}>
-                    {item.likes} likes
-                  </div>
-                  {item._count && (
-                    <div className={styles.stat}>
-                      {item._count.comments} comments
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ) : (
+                trendingStatuses.map((status) => (
+                  <Card key={status.id} className="hover:shadow-lg transition-all duration-300">
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        {status.profiles.username}
+                      </CardTitle>
+                      <CardDescription>
+                        {format(new Date(status.created_at), "MMMM d, yyyy 'at' h:mm a")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-foreground/80 mb-4">{status.content}</p>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Heart className="h-4 w-4" />
+                        <span>{status.likes} likes</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
 
-        {!isLoading && items.length === 0 && (
-          <div className="text-center text-gray-500 mt-8">
-            No trending items to show
-          </div>
-        )}
+          <TabsContent value="posts" className="mt-6">
+            <div className="grid gap-6">
+              {isLoading ? (
+                <div className="text-center py-8">Loading trending posts...</div>
+              ) : trendingPosts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No trending forum posts yet
+                </div>
+              ) : (
+                trendingPosts.map((post) => (
+                  <Card 
+                    key={post.id} 
+                    className="hover:shadow-lg transition-all duration-300 cursor-pointer"
+                    onClick={() => router.push(`/forum/${post.forum_id}`)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center justify-between">
+                        <span>{post.profiles.username}</span>
+                        <span className="text-sm text-muted-foreground">
+                          in {post.forums.name}
+                        </span>
+                      </CardTitle>
+                      <CardDescription>
+                        {format(new Date(post.created_at), "MMMM d, yyyy 'at' h:mm a")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-foreground/80 mb-4">{post.content}</p>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <MessageCircle className="h-4 w-4" />
+                        <span>{post._count.replies} replies</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   )

@@ -52,22 +52,37 @@ export default function ProfilePage() {
   const fetchUserContent = async () => {
     if (!user) return
 
-    // Fetch both forum posts and status updates
-    const [postsResult, statusResult] = await Promise.all([
-      supabase
-        .from('posts')
-        .select('*, profiles!posts_user_id_fkey(username)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('status_updates')
-        .select('*, profiles!status_updates_user_id_fkey(username)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-    ])
+    try {
+      const [postsResult, statusResult] = await Promise.all([
+        supabase
+          .from('posts')
+          .select(`
+            *,
+            forums!inner(name),
+            profiles!posts_user_id_fkey(username)
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('status_updates')
+          .select('*, profiles!status_updates_user_id_fkey(username)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+      ])
 
-    setPosts(postsResult.data || [])
-    // Status updates are handled by the StatusUpdate component
+      if (postsResult.error) throw postsResult.error
+      if (statusResult.error) throw statusResult.error
+
+      setPosts(postsResult.data || [])
+      // ... rest of the function
+    } catch (error) {
+      console.error('Error fetching content:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch content',
+        variant: 'destructive'
+      })
+    }
   }
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {

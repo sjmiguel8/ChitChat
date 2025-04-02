@@ -37,15 +37,23 @@ export default function ForumPage() {
     <Layout>
       <div className={styles.container}>
         <header className={styles.header}>
-          <p className={styles.title}>Current Forums</p>
-          <Button
-            onClick={() => router.push("/forum/new")}
-            className={styles.createButton}
-          >
-            Create New Forum
-          </Button>
+          <h1 className={styles.title}>Current Forums</h1>
+          <p className={styles.description}>
+            Join discussions or start your own forum
+          </p>
+          {user && (
+            <Button
+              onClick={() => router.push("/forum/new")}
+              className={styles.createButton}
+              size="lg"
+            >
+              Create New Forum
+            </Button>
+          )}
         </header>
-        <ForumList />
+        <main>
+          <ForumList />
+        </main>
       </div>
     </Layout>
   )

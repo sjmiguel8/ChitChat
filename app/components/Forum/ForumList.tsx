@@ -5,7 +5,8 @@ import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
+import { MessageSquare, Clock } from "lucide-react"
 
 interface Forum {
   id: number
@@ -128,24 +129,38 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
   }
 
   return (
-    <div className="mt-8 space-y-4">
+    <div className="grid gap-6 mt-8 px-4 md:px-6 lg:px-8">
       {forums.map((forum) => (
-        <Card key={forum.id}>
-          <CardHeader>
+        <Card 
+          key={forum.id} 
+          className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg border border-border/40"
+        >
+          <CardHeader className="space-y-4">
             <Link href={`/forum/${forum.id}`}>
-              <CardTitle className="text-xl hover:text-blue-600 transition-colors cursor-pointer">
+              <CardTitle className="text-2xl font-bold hover:text-primary transition-colors">
                 {forum.name}
               </CardTitle>
             </Link>
-            <CardDescription>
-              Created by {forum.user?.username || 'Unknown'} on{" "}
-              {format(new Date(forum.created_at), "MMM d, yyyy")}
+            <CardDescription className="text-sm space-y-2">
+              <p>Created by {forum.user?.username || 'Unknown'}</p>
+              <time className="text-xs text-muted-foreground">
+                {format(new Date(forum.created_at), "MMMM d, yyyy")}
+              </time>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 mb-4">{forum.description}</p>
-            <div className="text-sm text-gray-500">
-              {forum._count?.posts || 0} posts
+            <p className="text-foreground/80 mb-6 text-base leading-relaxed">
+              {forum.description}
+            </p>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <span>{forum._count?.posts || 0} posts</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span>{formatDistanceToNow(new Date(forum.created_at))} ago</span>
+              </div>
             </div>
           </CardContent>
         </Card>
