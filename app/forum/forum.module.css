@@ -2,24 +2,24 @@
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 4rem 2rem;
+    padding: 2rem;
     border-radius: 6px;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 2.5rem;
     padding: 2rem;
     background: hsl(var(--card));
-    border-radius: 1.5rem;
+    border-radius: 1.25rem;
     border: 1px solid hsl(var(--border));
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     margin-top: auto;
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 46%) 100%);
     -webkit-background-clip: text;
@@ -30,9 +30,9 @@
 
 .description {
     color: hsl(var(--muted-foreground));
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     max-width: 600px;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.5rem;
     line-height: 1.6;
     font-weight: 500;
 }
@@ -41,10 +41,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     font-size: 1.125rem;
     font-weight: 600;
-    color: hsl(var(--primary-foreground));
+    color: white;
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 46%) 100%);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
@@ -56,7 +56,7 @@
 
 .createButton:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 hsl(var(--primary) / 0.3);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .grid {
@@ -129,7 +129,7 @@
 @media (max-width: 768px) {
     .container {
         width: 95%;
-        padding: 0 0.5rem;
+        padding: 1rem;
     }
 
     .title {

@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format, formatDistanceToNow } from "date-fns"
-import { MessageSquare, Clock } from "lucide-react"
+import { MessageSquare, Clock, User } from "lucide-react"
 
 interface Forum {
   id: number
@@ -129,35 +129,37 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
   }
 
   return (
-    <div className="grid gap-6 mt-8 px-4 md:px-6 lg:px-8">
+    <div className="grid gap-6 mt-8">
       {forums.map((forum) => (
         <Card 
           key={forum.id} 
-          className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg border border-border/40"
+          className="transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg border border-border/40 bg-card"
         >
-          <CardHeader className="space-y-4">
+          <CardHeader className="space-y-2">
             <Link href={`/forum/${forum.id}`}>
-              <CardTitle className="text-2xl font-bold hover:text-primary transition-colors">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-[hsl(142,76%,46%)] bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                 {forum.name}
               </CardTitle>
             </Link>
-            <CardDescription className="text-sm space-y-2">
-              <p>Created by {forum.user?.username || 'Unknown'}</p>
-              <time className="text-xs text-muted-foreground">
+            <CardDescription className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span>Created by {forum.user?.username || 'Unknown'}</span>
+              <span className="text-xs opacity-60">•</span>
+              <time className="text-xs">
                 {format(new Date(forum.created_at), "MMMM d, yyyy")}
               </time>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-foreground/80 mb-6 text-base leading-relaxed">
+            <p className="text-foreground/80 mb-4 text-base leading-relaxed">
               {forum.description}
             </p>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
                 <MessageSquare className="h-4 w-4" />
                 <span>{forum._count?.posts || 0} posts</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4" />
                 <span>{formatDistanceToNow(new Date(forum.created_at))} ago</span>
               </div>

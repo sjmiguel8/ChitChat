@@ -39,17 +39,6 @@ interface ForumPost {
   replies?: Reply[]
 }
 
-interface StatusUpdate {
-  id: number
-  content: string
-  created_at: string
-  user_id: string
-  likes: number
-  user?: {
-    username: string | null
-  }
-}
-
 interface Reply {
   id: number
   content: string
@@ -68,7 +57,6 @@ interface ForumPostsProps {
 
 export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const [forumPosts, setForumPosts] = useState<ForumPost[]>([])
-  const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [newPost, setNewPost] = useState("")
   const [editingPost, setEditingPost] = useState<ForumPost | null>(null)
@@ -113,7 +101,6 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
 
   useEffect(() => {
     fetchForumPosts();
-    fetchStatusUpdates(); // Make sure status updates are fetched initially
 
     const postsChannel = supabase
       .channel(`posts_${forumId}`)
@@ -127,46 +114,10 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       })
       .subscribe();
 
-    const statusChannel = supabase
-      .channel('status_updates')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'status_updates'
-      }, () => {
-        fetchStatusUpdates();
-      })
-      .subscribe();
-
     return () => {
       supabase.removeChannel(postsChannel);
-      supabase.removeChannel(statusChannel);
     };
   }, [forumId]);
-
-  const fetchStatusUpdates = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('status_updates')
-        .select(`
-          *,
-          user:profiles(username)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      if (data) setStatusUpdates(data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching status updates:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch status updates',
-        variant: 'destructive'
-      });
-      return [];
-    }
-  };
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -446,29 +397,6 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
           ))}
           {forumPosts.length === 0 && (
             <p className={styles.emptyState}>No forum posts yet.</p>
-          )}
-        </div>
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Status Updates</h3>
-          {statusUpdates.map((status) => (
-            <div key={status.id} className={styles.statusCard}>
-              <div className={styles.postHeader}>
-                <div className={styles.postMeta}>
-                  <span className={styles.username}>{status.user?.username || 'Unknown'}</span>
-                  <span className={styles.timestamp}>
-                    {format(new Date(status.created_at), "MMM d, yyyy 'at' h:mm a")}
-                  </span>
-                </div>
-              </div>
-              <p className={styles.postContent}>{status.content}</p>
-              <div className={styles.statusFooter}>
-                <span className={styles.likes}>Likes: {status.likes}</span>
-              </div>
-            </div>
-          ))}
-          {statusUpdates.length === 0 && (
-            <p className={styles.emptyState}>No status updates yet.</p>
           )}
         </div>
       </ScrollArea>
