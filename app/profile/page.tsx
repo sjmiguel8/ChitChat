@@ -7,14 +7,21 @@ import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import StatusUpdate from "@/app/components/Profile/StatusUpdate"
 import styles from "./profile.module.css"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
+  const [username, setUsername] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState("")
+  const [uploading, setUploading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     getUser()
+    fetchUserProfile()
     fetchUserContent()
   }, [])
 
@@ -24,6 +31,21 @@ export default function ProfilePage() {
       setUser(user)
     } else {
       router.push("/auth")
+    }
+  }
+
+  const fetchUserProfile = async () => {
+    if (!user) return
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', user.id)
+      .single()
+
+    if (data) {
+      setUsername(data.username || '')
+      setAvatarUrl(data.avatar_url || '')
     }
   }
 
@@ -48,9 +70,71 @@ export default function ProfilePage() {
     // Status updates are handled by the StatusUpdate component
   }
 
+  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${user.id}/avatar.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
+      
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+      
+      setAvatarUrl(data.publicUrl)
+      toast({
+        title: "Success",
+        description: "Avatar updated successfully!"
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error uploading avatar",
+        variant: "destructive"
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <Layout>
       <div className={styles.container}>
+        <div className={styles.profileHeader}>
+          <div className={styles.avatarSection}>
+            <Avatar className={styles.avatar}>
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback>{username?.[0]?.toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className={styles.uploadSection}>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={uploadAvatar}
+                disabled={uploading}
+                className={styles.fileInput}
+              />
+              <p className={styles.username}>{username}</p>
+            </div>
+          </div>
+        </div>
+
         <h1 className={styles.title}>My Profile</h1>
         
         <Tabs defaultValue="status" className="w-full">

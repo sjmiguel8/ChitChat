@@ -6,7 +6,6 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 interface Forum {
   id: number
@@ -151,17 +150,6 @@ const ForumList = forwardRef<ForumListHandle, {}>((_, ref) => {
           </CardContent>
         </Card>
       ))}
-      <Dialog>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Forum</DialogTitle>
-            <DialogDescription>
-              Create a new discussion forum. Enter the details below.
-            </DialogDescription>
-          </DialogHeader>
-          {/* Rest of your dialog content */}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 })

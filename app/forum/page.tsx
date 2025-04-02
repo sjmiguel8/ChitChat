@@ -4,20 +4,23 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Layout from "../components/Layout/Layout"
 import ForumList from "../components/Forum/ForumList"
-import CreateForumForm from "../components/Forum/CreateForumForm"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button" // Add Button import
 import styles from "./forum.module.css"
 import { useUser } from "../lib/hooks"
 
 export default function ForumPage() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const router = useRouter()
-  const { user } = useUser()
-  const dialogDescription = "Create a new discussion forum. Enter a name and description for your forum."
+  const { user, loading } = useUser() // Get loading state from useUser
 
-  const handleForumCreated = () => {
-    setIsCreateOpen(false)
-    router.refresh()
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <Layout>
+        <div className={styles.container}>
+          <p className="text-center">Loading...</p>
+        </div>
+      </Layout>
+    )
   }
 
   if (!user) {
@@ -35,35 +38,14 @@ export default function ForumPage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <p className={styles.title}>Current Forums</p>
-          {user && (
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className={styles.createButton}
-              type="button"
-            >
-              Create New Forum
-            </button>
-          )}
+          <Button
+            onClick={() => router.push("/forum/new")}
+            className={styles.createButton}
+          >
+            Create New Forum
+          </Button>
         </header>
-
         <ForumList />
-
-        {isCreateOpen && (
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Forum</DialogTitle>
-                <DialogDescription>
-                  {dialogDescription}
-                </DialogDescription>
-              </DialogHeader>
-              <CreateForumForm
-                userId={user?.id || ""}
-                onForumCreated={handleForumCreated}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
     </Layout>
   )

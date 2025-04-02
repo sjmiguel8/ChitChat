@@ -27,12 +27,28 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
 
     setIsLoading(true)
     try {
+      // First ensure user has a profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .single()
+
+      if (profileError || !profile) {
+        // Create profile if it doesn't exist
+        const { error: createProfileError } = await supabase
+          .from('profiles')
+          .insert({ id: userId })
+
+        if (createProfileError) throw createProfileError
+      }
+
       const { data, error } = await supabase
-        .from("forums")
+        .from('forums')
         .insert({
           name: name.trim(),
           description: description.trim(),
-          created_by: userId,
+          created_by: userId
         })
         .select()
         .single()
@@ -41,13 +57,14 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
 
       toast({
         title: "Success",
-        description: "Forum created successfully!",
+        description: "Forum created successfully!"
       })
-      
-      // Clear form and redirect
+
       setName("")
       setDescription("")
       onForumCreated?.()
+      
+      // Navigate to the new forum
       router.push(`/forum/${data.id}`)
     } catch (error) {
       console.error("Error creating forum:", error)

@@ -5,16 +5,39 @@ import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import styles from "./status.module.css"
 import { format } from "date-fns"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface StatusUpdateProps {
   userId: string
+  username?: string
 }
 
-export default function StatusUpdate({ userId }: StatusUpdateProps) {
+export default function StatusUpdate({ userId, username }: StatusUpdateProps) {
   const [content, setContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [statuses, setStatuses] = useState<any[]>([])
   const { toast } = useToast()
+  const [editingStatus, setEditingStatus] = useState<any>(null)
+  const [editContent, setEditContent] = useState("")
+  const [deleteStatus, setDeleteStatus] = useState<any>(null)
 
   const fetchStatusUpdates = async () => {
     try {
@@ -91,6 +114,66 @@ export default function StatusUpdate({ userId }: StatusUpdateProps) {
     }
   }
 
+  const handleEdit = async () => {
+    if (!editingStatus || !editContent.trim() || isLoading) return
+
+    setIsLoading(true)
+    try {
+      const { error } = await supabase
+        .from("status_updates")
+        .update({ content: editContent.trim() })
+        .eq("id", editingStatus.id)
+        .eq("user_id", userId)
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "Status update edited successfully!"
+      })
+      setEditingStatus(null)
+      fetchStatusUpdates()
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to edit status update",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deleteStatus || isLoading) return
+
+    setIsLoading(true)
+    try {
+      const { error } = await supabase
+        .from("status_updates")
+        .delete()
+        .eq("id", deleteStatus.id)
+        .eq("user_id", userId)
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "Status update deleted successfully!"
+      })
+      setDeleteStatus(null)
+      fetchStatusUpdates()
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete status update",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit} className={styles.updateForm}>
@@ -115,13 +198,83 @@ export default function StatusUpdate({ userId }: StatusUpdateProps) {
       <div className={styles.statusList}>
         {statuses.map((status) => (
           <div key={status.id} className={styles.statusCard}>
+            <div className={styles.statusHeader}>
+              <div className={styles.userInfo}>
+                <span className={styles.username}>{status.profiles?.username || 'Unknown'}</span>
+                <span className={styles.timestamp}>
+                  {format(new Date(status.created_at), "MMM d, yyyy 'at' h:mm a")}
+                </span>
+              </div>
+              {status.user_id === userId && (
+                <div className={styles.actions}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setEditingStatus(status)
+                      setEditContent(status.content)
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteStatus(status)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              )}
+            </div>
             <p className={styles.content}>{status.content}</p>
-            <small className={styles.timestamp}>
-              {format(new Date(status.created_at), "MMM d, yyyy 'at' h:mm a")}
-            </small>
           </div>
         ))}
       </div>
+
+      {/* Add Edit Dialog */}
+      <Dialog open={!!editingStatus} onOpenChange={() => setEditingStatus(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Status Update</DialogTitle>
+            <DialogDescription>
+              Make changes to your status update below.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className={styles.textarea}
+            disabled={isLoading}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingStatus(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEdit} disabled={isLoading}>
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Delete Dialog */}
+      <AlertDialog open={!!deleteStatus} onOpenChange={() => setDeleteStatus(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Status Update</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your status update.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
+              {isLoading ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
