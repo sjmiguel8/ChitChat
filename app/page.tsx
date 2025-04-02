@@ -8,8 +8,8 @@ export default function Home() {
       <div className={styles.body}>
         <div className={styles.container}>
           <section id={styles.showcase}>
-            <h1>Debate!</h1>
-            <p>Where you can debate *about* anything and everything!</p>
+            <h1>ChitChat!</h1>
+            <p>Where you can chat *about* anything and everything!</p>
             <Link href="/forum">
             <button className={styles.ctaButton}> 
               Go To The Forums

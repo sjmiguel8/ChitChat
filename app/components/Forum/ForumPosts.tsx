@@ -65,6 +65,30 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
+  const fetchForumPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles!posts_user_id_fkey(username)
+        `)
+        .eq('forum_id', forumId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setForumPosts(data || []);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch posts',
+        variant: 'destructive'
+      });
+    }
+  };
+
   useEffect(() => {
     fetchForumPosts();
     fetchStatusUpdates(); // Make sure status updates are fetched initially
@@ -97,26 +121,6 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       supabase.removeChannel(statusChannel);
     };
   }, [forumId]);
-
-  const fetchForumPosts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*, user:profiles(username)')
-        .eq('forum_id', forumId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setForumPosts(data || []);
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch posts',
-        variant: 'destructive'
-      });
-    }
-  };
 
   const fetchStatusUpdates = async () => {
     try {

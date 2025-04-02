@@ -39,6 +39,7 @@ export default function ForumPage() {
             <button
               onClick={() => setIsCreateOpen(true)}
               className={styles.createButton}
+              type="button"
             >
               Create New Forum
             </button>
@@ -47,20 +48,22 @@ export default function ForumPage() {
 
         <ForumList />
 
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Forum</DialogTitle>
-              <DialogDescription>
-                Create a new discussion forum. Enter a name and description for your forum.
-              </DialogDescription>
-            </DialogHeader>
-            <CreateForumForm
-              userId={user?.id || ""}
-              onForumCreated={handleForumCreated}
-            />
-          </DialogContent>
-        </Dialog>
+        {isCreateOpen && (
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Forum</DialogTitle>
+                <DialogDescription>
+                  {dialogDescription}
+                </DialogDescription>
+              </DialogHeader>
+              <CreateForumForm
+                userId={user?.id || ""}
+                onForumCreated={handleForumCreated}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </Layout>
   )

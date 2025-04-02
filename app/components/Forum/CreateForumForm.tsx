@@ -33,9 +33,9 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
           name: name.trim(),
           description: description.trim(),
           created_by: userId,
-          user_id: userId,
         })
         .select()
+        .single()
 
       if (error) throw error
 
@@ -44,10 +44,11 @@ export default function CreateForumForm({ userId, onForumCreated }: CreateForumF
         description: "Forum created successfully!",
       })
       
-      // Clear form and trigger callback
+      // Clear form and redirect
       setName("")
       setDescription("")
       onForumCreated?.()
+      router.push(`/forum/${data.id}`)
     } catch (error) {
       console.error("Error creating forum:", error)
       toast({

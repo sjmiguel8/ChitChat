@@ -39,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
       <header className={styles.header}>
         <nav className={styles.nav}>
           <Link href="/" className={styles.logo}>
-            Debate
+            ChitChat
           </Link>
 
           <div className={styles.links}>
