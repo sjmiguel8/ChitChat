@@ -84,24 +84,14 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
       const { data, error } = await supabase
         .from('posts')
         .select(`
-          id,
-          content,
-          created_at,
-          forum_id,
-          user_id,
-          profiles:profiles!posts_user_id_fkey (
-            id,
-            username
-          ),
-          replies (
+          *,
+          profiles:profiles!posts_user_id_fkey(username),
+          replies(
             id,
             content,
             created_at,
             user_id,
-            profiles:profiles!replies_user_id_fkey (
-              id,
-              username
-            )
+            profiles:profiles!replies_user_id_fkey(username)
           )
         `)
         .eq('forum_id', forumId)

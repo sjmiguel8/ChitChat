@@ -83,7 +83,7 @@ export default function TrendingPage() {
       if (postsResult.error) throw postsResult.error
       if (statusResult.error) throw statusResult.error
 
-      // Transform data to include reply counts
+      // Transform posts data to include reply counts
       const postsWithCounts = (postsResult.data || []).map(post => ({
         ...post,
         _count: {

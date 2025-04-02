@@ -58,14 +58,18 @@ export default function ProfilePage() {
           .from('posts')
           .select(`
             *,
-            forums!inner(name),
-            profiles!posts_user_id_fkey(username)
+            forums!inner(id, name),
+            profiles!posts_user_id_fkey(username),
+            replies(id)
           `)
           .eq('user_id', user.id)
           .order('created_at', { ascending: false }),
         supabase
           .from('status_updates')
-          .select('*, profiles!status_updates_user_id_fkey(username)')
+          .select(`
+            *,
+            profiles!status_updates_user_id_fkey(username)
+          `)
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
       ])
@@ -74,7 +78,7 @@ export default function ProfilePage() {
       if (statusResult.error) throw statusResult.error
 
       setPosts(postsResult.data || [])
-      // ... rest of the function
+      setStatusUpdates(statusResult.data || [])
     } catch (error) {
       console.error('Error fetching content:', error)
       toast({
