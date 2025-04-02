@@ -31,9 +31,7 @@ interface ForumPost {
   profiles: {
     username: string
   }
-  _count: {
-    replies: number
-  }
+  replies: any[] // Change this to reflect replies array
 }
 
 interface StatusUpdate {
@@ -68,7 +66,7 @@ export default function TrendingPage() {
             *,
             forums!inner(id, name),
             profiles!posts_user_id_fkey(username),
-            _count(replies)
+            replies(id)
           `)
           .order('created_at', { ascending: false })
           .limit(10),
@@ -85,7 +83,15 @@ export default function TrendingPage() {
       if (postsResult.error) throw postsResult.error
       if (statusResult.error) throw statusResult.error
 
-      setTrendingPosts(postsResult.data || [])
+      // Transform data to include reply counts
+      const postsWithCounts = (postsResult.data || []).map(post => ({
+        ...post,
+        _count: {
+          replies: post.replies?.length || 0
+        }
+      }))
+
+      setTrendingPosts(postsWithCounts)
       setTrendingStatuses(statusResult.data || [])
     } catch (error) {
       console.error('Error fetching trending content:', error)
