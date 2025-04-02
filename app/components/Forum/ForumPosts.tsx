@@ -24,13 +24,25 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import styles from "./forum-posts.module.css"
+import { PostgrestError } from '@supabase/supabase-js'
 
-interface Post {
+interface ForumPost {
   id: number
   content: string
   created_at: string
   forum_id: number
   user_id: string
+  user?: {
+    username: string | null
+  }
+}
+
+interface StatusUpdate {
+  id: number
+  content: string
+  created_at: string
+  user_id: string
+  likes: number
   user?: {
     username: string | null
   }
@@ -42,19 +54,22 @@ interface ForumPostsProps {
 }
 
 export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
-  const [posts, setPosts] = useState<Post[]>([])
+  const [forumPosts, setForumPosts] = useState<ForumPost[]>([])
+  const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [newPost, setNewPost] = useState("")
-  const [editingPost, setEditingPost] = useState<Post | null>(null)
+  const [editingPost, setEditingPost] = useState<ForumPost | null>(null)
   const [editContent, setEditContent] = useState("")
-  const [deletePost, setDeletePost] = useState<Post | null>(null)
+  const [deletePost, setDeletePost] = useState<ForumPost | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchPosts()
+    fetchForumPosts()
+    fetchStatusUpdates()
 
-    const channel = supabase
+    // Subscribe to forum posts changes
+    const forumChannel = supabase
       .channel('forum_posts_changes')
       .on(
         'postgres_changes',
@@ -65,48 +80,74 @@ export default function ForumPosts({ forumId, userId }: ForumPostsProps) {
           filter: `forum_id=eq.${forumId}`
         },
         () => {
-          fetchPosts()
+          fetchForumPosts()
+        }
+      )
+      .subscribe()
+
+    // Subscribe to status updates changes
+    const statusChannel = supabase
+      .channel('status_updates_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'status_updates'
+        },
+        () => {
+          fetchStatusUpdates()
         }
       )
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(forumChannel)
+      supabase.removeChannel(statusChannel)
     }
   }, [forumId])
 
-const fetchPosts = async () => {
-  try {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*, user:profiles(username)')
-      .eq("forum_id", forumId)
-      .order("created_at", { ascending: true })
+  const fetchForumPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*, user:profiles(username)')
+        .eq('forum_id', forumId)
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      if (error instanceof SelectQueryError) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch posts due to a schema error. Please check your Supabase configuration.",
-          variant: "destructive",
-        })
-      } else {
-        throw error
-      }
-    } else {
-      setPosts(data)
+      if (error) throw error
+      setForumPosts(data || [])
+    } catch (error) {
+      console.error('Error fetching forum posts:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch forum posts',
+        variant: 'destructive'
+      })
     }
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Failed to fetch posts. Please try again.",
-      variant: "destructive",
-    })
-    console.error("Error fetching posts:", error)
-  } finally {
-    setIsLoading(false)
   }
-}
+
+  const fetchStatusUpdates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('status_updates')
+        .select(`
+          *,
+          user:profiles(username)
+        `)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setStatusUpdates(data || [])
+    } catch (error) {
+      console.error('Error fetching status updates:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch status updates',
+        variant: 'destructive'
+      })
+    }
+  }
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -127,7 +168,7 @@ const fetchPosts = async () => {
         description: "Your post has been published successfully!",
       })
       setNewPost("")
-      fetchPosts()
+      fetchForumPosts()
     } catch (error) {
       toast({
         title: "Error",
@@ -156,7 +197,7 @@ const fetchPosts = async () => {
         title: "Post Updated",
         description: "Your post has been updated successfully!",
       })
-      fetchPosts()
+      fetchForumPosts()
       setEditingPost(null)
     } catch (error) {
       toast({
@@ -186,7 +227,7 @@ const fetchPosts = async () => {
         title: "Post Deleted",
         description: "Your post has been deleted successfully.",
       })
-      fetchPosts()
+      fetchForumPosts()
     } catch (error) {
       toast({
         title: "Error",
@@ -227,43 +268,67 @@ const fetchPosts = async () => {
       </div>
 
       <ScrollArea className={styles.postsList}>
-        {posts.map((post) => (
-          <div key={post.id} className={styles.postCard}>
-            <div className={styles.postHeader}>
-              <div className={styles.postMeta}>
-                <span className={styles.username}>{post.user?.username || 'Unknown'}</span>
-                <span className={styles.timestamp}>
-                  {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
-                </span>
-              </div>
-              {post.user_id === userId && (
-                <div className={styles.actions}>
-                  <button
-                    className={styles.editButton}
-                    onClick={() => {
-                      setEditingPost(post)
-                      setEditContent(post.content)
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => setDeletePost(post)}
-                  >
-                    Delete
-                  </button>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Forum Posts</h3>
+          {forumPosts.map((post) => (
+            <div key={post.id} className={styles.postCard}>
+              <div className={styles.postHeader}>
+                <div className={styles.postMeta}>
+                  <span className={styles.username}>{post.user?.username || 'Unknown'}</span>
+                  <span className={styles.timestamp}>
+                    {format(new Date(post.created_at), "MMM d, yyyy 'at' h:mm a")}
+                  </span>
                 </div>
-              )}
+                {post.user_id === userId && (
+                  <div className={styles.actions}>
+                    <button
+                      className={styles.editButton}
+                      onClick={() => {
+                        setEditingPost(post)
+                        setEditContent(post.content)
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => setDeletePost(post)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+              <p className={styles.postContent}>{post.content}</p>
             </div>
-            <p className={styles.postContent}>{post.content}</p>
-          </div>
-        ))}
-        {posts.length === 0 && (
-          <p className={styles.emptyState}>
-            No posts yet. Be the first to post in this forum!
-          </p>
-        )}
+          ))}
+          {forumPosts.length === 0 && (
+            <p className={styles.emptyState}>No forum posts yet.</p>
+          )}
+        </div>
+
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Status Updates</h3>
+          {statusUpdates.map((status) => (
+            <div key={status.id} className={styles.statusCard}>
+              <div className={styles.postHeader}>
+                <div className={styles.postMeta}>
+                  <span className={styles.username}>{status.user?.username || 'Unknown'}</span>
+                  <span className={styles.timestamp}>
+                    {format(new Date(status.created_at), "MMM d, yyyy 'at' h:mm a")}
+                  </span>
+                </div>
+              </div>
+              <p className={styles.postContent}>{status.content}</p>
+              <div className={styles.statusFooter}>
+                <span className={styles.likes}>Likes: {status.likes}</span>
+              </div>
+            </div>
+          ))}
+          {statusUpdates.length === 0 && (
+            <p className={styles.emptyState}>No status updates yet.</p>
+          )}
+        </div>
       </ScrollArea>
 
       <Dialog open={!!editingPost} onOpenChange={() => setEditingPost(null)}>
@@ -307,65 +372,3 @@ const fetchPosts = async () => {
     </div>
   )
 }
-
-export default function ForumPage() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const router = useRouter();
-  const { user } = useUser();
-
-  const handleForumCreated = () => {
-    setIsCreateOpen(false);
-    router.refresh();
-  };
-
-  const handlePostCreated = () => {
-    router.push(`/forum/${forumId}`);
-  };
-
-  return (
-    <Layout>
-      <div className={styles.container}>
-        <header className={styles.header}>
-          <p className={styles.title}>Current Forums</p>
-          {user && (
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className={styles.createButton}
-            >
-              Create New Forum
-            </button>
-          )}
-        </header>
-
-        <ForumList />
-
-        {isCreateOpen && (
-          <CreateForumForm
-            userId={user?.id || ""}
-            onForumCreated={handleForumCreated}
-          />
-        )}
-
-        <ForumPosts
-          forumId={forumId}
-          userId={user?.id || ""}
-          onPostCreated={handlePostCreated}
-        />
-      </div>
-    </Layout>
-  );
-}
-
-CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  forum_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
-  FOREIGN KEY (forum_id) REFERENCES forums (id),
-  FOREIGN KEY (user_id) REFERENCES users (id)
-);
-
-CREATE INDEX idx_posts_forum_id ON posts (forum_id);
-CREATE INDEX idx_posts_user_id ON posts (user_id);
